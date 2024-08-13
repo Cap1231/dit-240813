@@ -2,12 +2,12 @@ export class CanvasImageController {
     constructor(canvasId, imageUrl) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
+        this.img =  new Image();
         this.imgPos = null; // Canvas内で表示している画像の絶対座標
         this.rectangles = []; // 選択した矩形たちの絶対座標
         this.currentRect = null; // 現在選択している矩形の絶対座標
-        this.startPos = null;  // ドラッグ開始点の絶対座標
+        this.startPos = null; // ドラッグ開始点の絶対座標
         this.isDragging = false;
-        this.img =  new Image();
 
         this.setupImage(imageUrl);
         this.attachEventListeners();
