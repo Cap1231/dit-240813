@@ -83,8 +83,8 @@ export class CanvasImageController {
     // 矩形描画処理中のステート管理
     //
     // 描画されている矩形に新規で描画する矩形を追加
-    addRectangle(rect) {
-        this.rectangles.push(rect);
+    addCurrentRectangle() {
+        this.rectangles.push(this.currentRect);
     }
 
     // 現在ドラッグで描画している矩形情報を計算する
@@ -126,9 +126,9 @@ export class CanvasImageController {
     //
     // Validation
     //
-    // 新しい矩形が既存のいずれかの矩形と重複していないか確認
-    checkOverlap(newRect) {
-        return this.rectangles.some(rect => this.checkRectanglesOverlap(rect, newRect));
+    // ドラッグした矩形が既存のいずれかの矩形と重複していないか確認
+    checkOverlap() {
+        return this.rectangles.some(rect => this.checkRectanglesOverlap(rect, this.currentRect));
     }
 
     checkRectanglesOverlap(rect1, rect2) {
@@ -139,7 +139,8 @@ export class CanvasImageController {
     }
 
     // 矩形が画像内にあるかチェック
-    checkWithinImage(rect) {
+    checkWithinImage() {
+        const rect = this.currentRect
         return rect.x >= this.imgPos.x &&
             rect.x + rect.width <= this.imgPos.x + this.imgPos.width &&
             rect.y >= this.imgPos.y &&
@@ -181,18 +182,18 @@ export class CanvasImageController {
         if (!this.isDragging || !this.currentRect) return;
 
         // 矩形が画像内にあるかチェック
-        if (!this.checkWithinImage(this.currentRect)) {
-            this.handleRectangleCreationError('Error: 矩形が画像の範囲外です。');
+        if (!this.checkWithinImage()) {
+            this.handleRectangleCreationError('Error: 画像の範囲外を選択しています');
             return;
         }
 
         // 矩形の重複チェック
-        if (this.checkOverlap(this.currentRect)) {
-            this.handleRectangleCreationError('Error: 重複しました。');
+        if (this.checkOverlap()) {
+            this.handleRectangleCreationError('Error: 重複しました');
             return;
         }
 
-        this.addRectangle(this.currentRect)
+        this.addCurrentRectangle()
         this.updateCanvas()
         this.resetDraggingState()
     }
