@@ -32,6 +32,13 @@ export class CanvasImageController {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
+    // 全ての矩形を描画して、Canvasを最新にする
+    updateCanvas() {
+        this.clearCanvas();
+        this.drawImage();
+        this.drawRectangles();
+    }
+
     getImagePositionOnCanvas() {
         const canvasWidth = this.canvas.width;
         const canvasHeight = this.canvas.height;
@@ -62,12 +69,39 @@ export class CanvasImageController {
         this.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
     }
 
-    drawDraggedRectangle(rect) {
-        this.drawRectangle(rect);
+    // 現在ドラッグしている矩形を描画
+    drawCurrentRectangle() {
+        this.drawRectangle(this.currentRect);
     }
 
+    // 全ての矩形を描画
     drawRectangles() {
         this.rectangles.forEach(rect => this.drawRectangle(rect));
+    }
+
+    addRectangle(rect) {
+        this.rectangles.push(rect);
+    }
+
+    // 現在ドラッグで描画している矩形情報を計算する
+    // x: ドラッグ開始点と現在点のうち、小さい方を x 座標とする
+    // y: ドラッグ開始点と現在点のうち、小さい方を y 座標とする
+    // width : 始点と現在点の差の絶対値の高さ
+    // height: 始点と現在点の差の絶対値の幅
+    calcCurrentRectangle(e) {
+        this.currentRect = {
+            x: Math.min(this.startPos.x, e.offsetX),
+            y: Math.min(this.startPos.y, e.offsetY),
+            width: Math.abs(e.offsetX - this.startPos.x),
+            height: Math.abs(e.offsetY - this.startPos.y)
+        }
+    }
+
+    // ドラッグ終了後に管理していたステートをリセット
+    // ドラッグ終了 = 1矩形の描画完了
+    resetDraggingState() {
+        this.currentRect = null;
+        this.isDragging = false;
     }
 
     //
@@ -98,15 +132,8 @@ export class CanvasImageController {
     //
     handleRectangleCreationError(message) {
         alert(message);
-
-        // TODO: 切り出し
-        this.clearCanvas();
-        this.drawImage();
-        this.drawRectangles();
-
-        // TODO: 切り出し
-        this.currentRect = null;
-        this.isDragging = false;
+        this.updateCanvas()
+        this.resetDraggingState()
     }
 
     //
@@ -129,21 +156,10 @@ export class CanvasImageController {
     handleMouseMove(e) {
         if (!this.isDragging) return;
 
-        // TODO: 切り出し
-        this.clearCanvas();
-        this.drawImage();
-        this.drawRectangles();
-
-
-        // TODO: 切り出し
+        this.updateCanvas()
         // 現在ドラッグしている矩形を描画
-        this.currentRect = {
-            x: Math.min(this.startPos.x, e.offsetX), // ドラッグ開始点と現在点のうち、小さい方を x 座標とする
-            y: Math.min(this.startPos.y, e.offsetY),// 同様に y 座標も定義
-            width: Math.abs(e.offsetX - this.startPos.x), // 幅は始点と現在点の差の絶対値
-            height: Math.abs(e.offsetY - this.startPos.y) // 高さも同様
-        };
-        this.drawDraggedRectangle(this.currentRect);
+        this.calcCurrentRectangle(e)
+        this.drawCurrentRectangle();
     }
 
     handleMouseUp(e) {
@@ -161,16 +177,8 @@ export class CanvasImageController {
             return;
         }
 
-        // TODO: 切り出し
-        this.rectangles.push(this.currentRect);
-
-        // TODO: 切り出し
-        this.clearCanvas();
-        this.drawImage();
-        this.drawRectangles();
-
-        // TODO: 切り出し
-        this.currentRect = null;
-        this.isDragging = false;
+        this.addRectangle(this.currentRect)
+        this.updateCanvas()
+        this.resetDraggingState()
     }
 }
