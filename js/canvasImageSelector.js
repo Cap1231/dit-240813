@@ -1,14 +1,16 @@
 // TODO: 別ファイルに切り出す
 //
-// 画像描画
+// 描画する前のCanvas準備
 //
-const drawImageOnCanvas = (canvas, ctx, img) => {
-    // キャンバスサイズを動的に設定
+// Canvasサイズを動的に設定
+const resizeCanvas = (canvas) => {
     canvas.width = window.innerWidth * 0.8; // 画面の幅の80%
     canvas.height = window.innerHeight * 0.8; // 画面の高さの80%
-
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
+}
+// Canvasに画像を読み込み
+const drawImageOnCanvas = (ctx, img) => {
+    const canvasWidth = ctx.canvas.width;
+    const canvasHeight = ctx.canvas.height;
 
     // アスペクト比を保持しながらサイズを最大限に調整
     const ratio = Math.min(canvasWidth / img.width, canvasHeight / img.height);
@@ -62,7 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
     img.src = '../img/sample1.png';
 
     img.onload = () => {
-        drawImageOnCanvas(canvas, ctx, img)
+        resizeCanvas(canvas)
+        drawImageOnCanvas(ctx, img)
     };
 
     let startX, startY, isDragging = false;
@@ -78,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isDragging) return;
 
         clearCanvas(ctx)
-        drawImageOnCanvas(canvas, ctx, img);
+        drawImageOnCanvas(ctx, img);
 
         // 保存されている全矩形を再描画
         drawRectangles(ctx, rectangles);
@@ -113,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error: Rectangles cannot overlap!');
             // 重複がある場合は、既存の矩形のみを再描画
             clearCanvas(ctx)
-            drawImageOnCanvas(canvas, ctx, img);
+            drawImageOnCanvas(ctx, img);
 
             drawRectangles(ctx, rectangles);
             isDragging = false;
@@ -121,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         clearCanvas(ctx)
-        drawImageOnCanvas(canvas, ctx, img);
+        drawImageOnCanvas(ctx, img);
 
         rectangles.push(newRect); // 矩形を配列に追加
         drawRectangles(ctx, rectangles);
