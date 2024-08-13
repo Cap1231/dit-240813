@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let startX, startY, isDragging = false;
     const rectangles = [];
+    let currentRect = null;
 
     canvas.addEventListener('mousedown', (e) => {
         startX = e.offsetX;
@@ -95,36 +96,34 @@ document.addEventListener('DOMContentLoaded', () => {
         drawRectangles(ctx, rectangles); // 重複がある場合は、既存の矩形のみを再描画
 
         // 現在ドラッグしている矩形を描画
-        const draggedRect = {
-            x: startX,
-            y: startY,
-            width: e.offsetX - startX,
-            height: e.offsetY - startY
+        currentRect = {
+            x: Math.min(startX, e.offsetX), // ドラッグ開始点と現在点のうち、小さい方を x 座標とする
+            y: Math.min(startY, e.offsetY), // 同様に y 座標も定義
+            width: Math.abs(e.offsetX - startX), // 幅は始点と現在点の差の絶対値
+            height: Math.abs(e.offsetY - startY) // 高さも同様
         };
-        drawDraggedRectangle(ctx, draggedRect)
+        drawDraggedRectangle(ctx, currentRect)
     });
 
     canvas.addEventListener('mouseup', (e) => {
         if (!isDragging) return;
-        const width = Math.abs(e.offsetX - startX);
-        const height = Math.abs(e.offsetY - startY);
-        const x = Math.min(startX, e.offsetX);
-        const y = Math.min(startY, e.offsetY);
-        const newRect = { x: x, y: y, width: width, height: height };
+        if (!currentRect) return;
 
-        const isOverlapped = checkOverlap(rectangles, newRect);
+        const isOverlapped = checkOverlap(rectangles, currentRect);
 
         if (isOverlapped) {
             // 重複がある場合は、既存の矩形のみを再描画
             alert('Error: Rectangles cannot overlap!');
         } else {
             // 重複がない場合は、既存の矩形＋新規矩形を描画
-            rectangles.push(newRect);
+            rectangles.push(currentRect);
         }
 
         clearCanvas(ctx)
         drawImageOnCanvas(ctx, img);
         drawRectangles(ctx, rectangles);
+        console.log(rectangles) // TODO: Delete.
+        currentRect = null;
         isDragging = false;
     });
 });
