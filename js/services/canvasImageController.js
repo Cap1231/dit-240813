@@ -46,11 +46,17 @@ export class CanvasImageController {
         };
     }
 
+    //
+    // Canvas内の画像描画
+    //
     drawImage() {
         const { x, y, width, height } = this.imgPos;
         this.ctx.drawImage(this.img, x, y, width, height);
     }
 
+    //
+    // Canvas内の矩形描画
+    //
     drawRectangle(rect) {
         this.ctx.strokeStyle = '#FF0000';
         this.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
@@ -64,18 +70,22 @@ export class CanvasImageController {
         this.rectangles.forEach(rect => this.drawRectangle(rect));
     }
 
+    //
+    // Validation
+    //
+    // 新しい矩形が既存のいずれかの矩形と重複していないか確認
     checkOverlap(newRect) {
-        return this.rectangles.some(rect => this.rectanglesOverlap(rect, newRect));
+        return this.rectangles.some(rect => this.checkRectanglesOverlap(rect, newRect));
     }
 
-    // TODO: 名前
-    rectanglesOverlap(rect1, rect2) {
+    checkRectanglesOverlap(rect1, rect2) {
         return !(rect2.x > rect1.x + rect1.width ||
             rect2.x + rect2.width < rect1.x ||
             rect2.y > rect1.y + rect1.height ||
             rect2.y + rect2.height < rect1.y);
     }
 
+    // 矩形が画像内にあるかチェック
     checkWithinImage(rect) {
         return rect.x >= this.imgPos.x &&
             rect.x + rect.width <= this.imgPos.x + this.imgPos.width &&
@@ -83,6 +93,25 @@ export class CanvasImageController {
             rect.y + rect.height <= this.imgPos.y + this.imgPos.height;
     }
 
+    //
+    // ErrorHandler
+    //
+    handleRectangleCreationError(message) {
+        alert(message);
+
+        // TODO: 切り出し
+        this.clearCanvas();
+        this.drawImage();
+        this.drawRectangles();
+
+        // TODO: 切り出し
+        this.currentRect = null;
+        this.isDragging = false;
+    }
+
+    //
+    // EventListener
+    //
     attachEventListeners() {
         this.canvas.addEventListener('mousedown', e => this.handleMouseDown(e));
         this.canvas.addEventListener('mousemove', e => this.handleMouseMove(e));
@@ -100,17 +129,19 @@ export class CanvasImageController {
     handleMouseMove(e) {
         if (!this.isDragging) return;
 
+        // TODO: 切り出し
         this.clearCanvas();
         this.drawImage();
         this.drawRectangles();
 
-        console.log(this.startPos)
-        console.log(this.currentRect)
+
+        // TODO: 切り出し
+        // 現在ドラッグしている矩形を描画
         this.currentRect = {
-            x: Math.min(this.startPos.x, e.offsetX),
-            y: Math.min(this.startPos.y, e.offsetY),
-            width: Math.abs(e.offsetX - this.startPos.x),
-            height: Math.abs(e.offsetY - this.startPos.y)
+            x: Math.min(this.startPos.x, e.offsetX), // ドラッグ開始点と現在点のうち、小さい方を x 座標とする
+            y: Math.min(this.startPos.y, e.offsetY),// 同様に y 座標も定義
+            width: Math.abs(e.offsetX - this.startPos.x), // 幅は始点と現在点の差の絶対値
+            height: Math.abs(e.offsetY - this.startPos.y) // 高さも同様
         };
         this.drawDraggedRectangle(this.currentRect);
     }
@@ -130,23 +161,15 @@ export class CanvasImageController {
             return;
         }
 
+        // TODO: 切り出し
         this.rectangles.push(this.currentRect);
 
+        // TODO: 切り出し
         this.clearCanvas();
         this.drawImage();
         this.drawRectangles();
 
-        this.currentRect = null;
-        this.isDragging = false;
-    }
-
-    handleRectangleCreationError(message) {
-        alert(message);
-
-        this.clearCanvas();
-        this.drawImage();
-        this.drawRectangles();
-
+        // TODO: 切り出し
         this.currentRect = null;
         this.isDragging = false;
     }
