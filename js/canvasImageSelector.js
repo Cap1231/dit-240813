@@ -1,14 +1,22 @@
 // TODO: 別ファイルに切り出す
 //
-// 描画する前のCanvas準備
+// Canvas全体
 //
 // Canvasサイズを動的に設定
 const resizeCanvas = (canvas) => {
     canvas.width = window.innerWidth * 0.8; // 画面の幅の80%
     canvas.height = window.innerHeight * 0.8; // 画面の高さの80%
 }
-// Canvasに画像を読み込み
-const drawImageOnCanvas = (ctx, img) => {
+// Canvasクリア
+const clearCanvas = (ctx) => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+
+//
+// Canvas内の画像
+//
+// Canvasに書き込む画像の座標を取得
+const getImagePositionOnCanvas = (ctx, img) => {
     const canvasWidth = ctx.canvas.width;
     const canvasHeight = ctx.canvas.height;
 
@@ -21,15 +29,15 @@ const drawImageOnCanvas = (ctx, img) => {
     const xOffset = Math.round((canvasWidth - newWidth) / 2);
     const yOffset = Math.round((canvasHeight - newHeight) / 2);
 
-    ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
+    return { x: xOffset, y: yOffset, width: newWidth, height: newHeight };
 }
-// Canvasクリア
-const clearCanvas = (ctx) => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+// Canvasに画像を描画
+const drawImage = (ctx, img, imgPos) => {
+    ctx.drawImage(img, imgPos.x, imgPos.y, imgPos.width, imgPos.height);
 }
 
 //
-// 矩形描画
+// Canvas内の矩形
 //
 const drawRectangle = (ctx, rect) => {
     ctx.strokeStyle = '#FF0000';
@@ -69,58 +77,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('myCanvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
+    let imgPos = null; // Canvas内で表示している画像の絶対座標
+    const rectangles = []; // 選択した矩形たちの絶対座標
+    let currentRect = null; // 現在選択している矩形の絶対座標
+    let startPos = null;  // ドラッグ開始点の絶対座標
+    let isDragging = false;
 
     // TODO: 画像は適当に指定しているので変更してください
     img.src = '../img/sample1.png';
 
     img.onload = () => {
         resizeCanvas(canvas)
-        drawImageOnCanvas(ctx, img)
+        imgPos = getImagePositionOnCanvas(ctx, img)
+        console.log("imgPos: ", imgPos)
+        drawImage(ctx, img, imgPos)
     };
 
-    let startX, startY, isDragging = false;
-    const rectangles = [];
-    let currentRect = null;
-
     canvas.addEventListener('mousedown', (e) => {
-        startX = e.offsetX;
-        startY = e.offsetY;
+        startPos = {
+            x: e.offsetX,
+            y: e.offsetY
+        };
         isDragging = true;
     });
 
+    // ドラッグ中は、drawRectangles + drawDraggedRectangle
     canvas.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
 
         clearCanvas(ctx)
-        drawImageOnCanvas(ctx, img);
-        drawRectangles(ctx, rectangles); // 重複がある場合は、既存の矩形のみを再描画
+        drawImage(ctx, img, imgPos);
+        drawRectangles(ctx, rectangles);
 
         // 現在ドラッグしている矩形を描画
         currentRect = {
-            x: Math.min(startX, e.offsetX), // ドラッグ開始点と現在点のうち、小さい方を x 座標とする
-            y: Math.min(startY, e.offsetY), // 同様に y 座標も定義
-            width: Math.abs(e.offsetX - startX), // 幅は始点と現在点の差の絶対値
-            height: Math.abs(e.offsetY - startY) // 高さも同様
+            x: Math.min(startPos.x, e.offsetX), // ドラッグ開始点と現在点のうち、小さい方を x 座標とする
+            y: Math.min(startPos.y, e.offsetY), // 同様に y 座標も定義
+            width: Math.abs(e.offsetX - startPos.x), // 幅は始点と現在点の差の絶対値
+            height: Math.abs(e.offsetY - startPos.y) // 高さも同様
         };
         drawDraggedRectangle(ctx, currentRect)
     });
 
+    // ドラッグ終了時は、drawRectangles
     canvas.addEventListener('mouseup', (e) => {
         if (!isDragging) return;
         if (!currentRect) return;
 
         const isOverlapped = checkOverlap(rectangles, currentRect);
-
         if (isOverlapped) {
             // 重複がある場合は、既存の矩形のみを再描画
-            alert('Error: Rectangles cannot overlap!');
+            alert('Error: 重複しました');
         } else {
             // 重複がない場合は、既存の矩形＋新規矩形を描画
             rectangles.push(currentRect);
         }
 
         clearCanvas(ctx)
-        drawImageOnCanvas(ctx, img);
+        drawImage(ctx, img, imgPos);
         drawRectangles(ctx, rectangles);
         console.log(rectangles) // TODO: Delete.
         currentRect = null;
