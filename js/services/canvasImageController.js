@@ -79,6 +79,10 @@ export class CanvasImageController {
         this.rectangles.forEach(rect => this.drawRectangle(rect));
     }
 
+    //
+    // 矩形描画処理中のステート管理
+    //
+    // 描画されている矩形に新規で描画する矩形を追加
     addRectangle(rect) {
         this.rectangles.push(rect);
     }
@@ -97,9 +101,24 @@ export class CanvasImageController {
         }
     }
 
-    // ドラッグ終了後に管理していたステートをリセット
-    // ドラッグ終了 = 1矩形の描画完了
+    // ドラッグ開始時に管理するステートをセット
+    setDraggingState(e) {
+        this.startPos = {
+            x: e.offsetX,
+            y: e.offsetY
+        };
+        this.currentRect = {
+            x: e.offsetX,
+            y: e.offsetY,
+            width: 0,
+            height: 0
+        }
+        this.isDragging = true;
+    }
+
+    // ドラッグ終了時に管理していたステートをリセット
     resetDraggingState() {
+        this.startPos = null;
         this.currentRect = null;
         this.isDragging = false;
     }
@@ -146,11 +165,7 @@ export class CanvasImageController {
     }
 
     handleMouseDown(e) {
-        this.startPos = {
-            x: e.offsetX,
-            y: e.offsetY
-        };
-        this.isDragging = true;
+        this.setDraggingState(e)
     }
 
     handleMouseMove(e) {
