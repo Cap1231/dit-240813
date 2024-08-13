@@ -1,4 +1,7 @@
 // TODO: 別ファイルに切り出す
+//
+// 画像描画
+//
 const drawImageOnCanvas = (canvas, ctx, img) => {
     // キャンバスサイズを動的に設定
     canvas.width = window.innerWidth * 0.8; // 画面の幅の80%
@@ -18,14 +21,37 @@ const drawImageOnCanvas = (canvas, ctx, img) => {
 
     ctx.drawImage(img, xOffset, yOffset, newWidth, newHeight);
 }
+// Canvasクリア
+const clearCanvas = (ctx) => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
 
-// ２つの図形の重複確認
+//
+// 矩形描画
+//
+const drawRectangle = (ctx, rect) => {
+    ctx.strokeStyle = '#FF0000';
+    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+}
+
+const drawDraggedRectangle = (ctx, rect) => {
+    drawRectangle(ctx, rect);
+}
+
+const drawRectangles = (ctx, rectangles) => {
+    rectangles.forEach(rect => {
+        drawRectangle(ctx, rect)
+    });
+}
+
+// ２つの矩形の重複確認
 const rectanglesOverlap = (rect1, rect2) => {
     return !(rect2.x > rect1.x + rect1.width ||
         rect2.x + rect2.width < rect1.x ||
         rect2.y > rect1.y + rect1.height ||
         rect2.y + rect2.height < rect1.y);
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('myCanvas');
@@ -51,18 +77,20 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        clearCanvas(ctx)
         drawImageOnCanvas(canvas, ctx, img);
+
         // 保存されている全矩形を再描画
-        rectangles.forEach(rect => {
-            ctx.strokeStyle = '#FF0000';
-            ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
-        });
-        // 現在の矩形を描画
-        const width = e.offsetX - startX;
-        const height = e.offsetY - startY;
-        ctx.strokeStyle = '#FF0000';
-        ctx.strokeRect(startX, startY, width, height);
+        drawRectangles(ctx, rectangles);
+
+        // 現在ドラッグしている矩形を描画
+        const draggedRect = {
+            x: startX,
+            y: startY,
+            width: e.offsetX - startX,
+            height: e.offsetY - startY
+        };
+        drawDraggedRectangle(ctx, draggedRect)
     });
 
     canvas.addEventListener('mouseup', (e) => {
@@ -83,24 +111,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (overlap) {
             alert('Error: Rectangles cannot overlap!');
-            // 重複がある場合は、ここで処理を中断し、キャンバスをリセットして既存の矩形のみを再描画
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 重複がある場合は、既存の矩形のみを再描画
+            clearCanvas(ctx)
             drawImageOnCanvas(canvas, ctx, img);
-            rectangles.forEach(rect => {
-                ctx.strokeStyle = '#FF0000';
-                ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
-            });
+
+            drawRectangles(ctx, rectangles);
             isDragging = false;
             return;
         }
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        clearCanvas(ctx)
         drawImageOnCanvas(canvas, ctx, img);
+
         rectangles.push(newRect); // 矩形を配列に追加
-        rectangles.forEach(rect => {
-            ctx.strokeStyle = '#FF0000';
-            ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
-        });
+        drawRectangles(ctx, rectangles);
         isDragging = false;
     });
 });
