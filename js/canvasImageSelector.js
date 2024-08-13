@@ -55,7 +55,7 @@ const drawRectangles = (ctx, rectangles) => {
 }
 
 // 新しい矩形が既存のいずれかの矩形と重複していないか確認
-const checkOverlap = (rectangles, newRect) => {
+const checkOverlap = (newRect, rectangles) => {
     for (const rect of rectangles) {
         if (rectanglesOverlap(rect, newRect)) {
             return true;
@@ -72,6 +72,13 @@ const rectanglesOverlap = (rect1, rect2) => {
         rect2.y + rect2.height < rect1.y);
 }
 
+// 矩形が画像内にあるかチェック
+const checkWithinImage = (rect, imgPos) => {
+    return rect.x >= imgPos.x &&
+        rect.x + rect.width <= imgPos.x + imgPos.width &&
+        rect.y >= imgPos.y &&
+        rect.y + rect.height <= imgPos.y + imgPos.height;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('myCanvas');
@@ -121,23 +128,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ドラッグ終了時は、drawRectangles
     canvas.addEventListener('mouseup', (e) => {
-        if (!isDragging) return;
-        if (!currentRect) return;
+        if (!isDragging || !currentRect) return;
 
-        const isOverlapped = checkOverlap(rectangles, currentRect);
-        if (isOverlapped) {
-            // 重複がある場合は、既存の矩形のみを再描画
-            alert('Error: 重複しました');
-        } else {
-            // 重複がない場合は、既存の矩形＋新規矩形を描画
-            rectangles.push(currentRect);
+        // 矩形が画像内にあるかチェック
+        if (!checkWithinImage(currentRect, imgPos)) {
+            _handleSelectionError('Error: 画像内を選択してください');
+            return;
         }
 
+        // 矩形の重複チェック
+        if (checkOverlap(currentRect, rectangles)) {
+            // 重複がある場合は、既存の矩形のみを再描画
+            _handleSelectionError('Error: 重複しないように選択してください');
+            return;
+        }
+
+        rectangles.push(currentRect);
         clearCanvas(ctx)
         drawImage(ctx, img, imgPos);
         drawRectangles(ctx, rectangles);
-        console.log(rectangles) // TODO: Delete.
         currentRect = null;
         isDragging = false;
     });
+
+    const _handleSelectionError = (message) => {
+        alert(message);
+        clearCanvas(ctx);
+        drawImage(ctx, img, imgPos);
+        drawRectangles(ctx, rectangles);
+        currentRect = null;
+        isDragging = false;
+    }
 });
