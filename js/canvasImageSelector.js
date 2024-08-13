@@ -132,14 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 矩形が画像内にあるかチェック
         if (!checkWithinImage(currentRect, imgPos)) {
-            _handleSelectionError('Error: 画像内を選択してください');
+            _handleRectangleCreationError('Error: 画像内を選択してください');
             return;
         }
 
         // 矩形の重複チェック
         if (checkOverlap(currentRect, rectangles)) {
             // 重複がある場合は、既存の矩形のみを再描画
-            _handleSelectionError('Error: 重複しないように選択してください');
+            _handleRectangleCreationError('Error: 重複しないように選択してください');
             return;
         }
 
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isDragging = false;
     });
 
-    const _handleSelectionError = (message) => {
+    const _handleRectangleCreationError = (message) => {
         alert(message);
         clearCanvas(ctx);
         drawImage(ctx, img, imgPos);
