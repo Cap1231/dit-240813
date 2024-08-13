@@ -1,3 +1,5 @@
+import { COLORS } from "../constants";
+
 export class CanvasImageController {
     constructor(canvasId, imageUrl) {
         this.canvas = document.getElementById(canvasId);
@@ -65,7 +67,7 @@ export class CanvasImageController {
     // Canvas内の矩形描画
     //
     drawRectangle(rect) {
-        this.ctx.strokeStyle = '#FF0000';
+        this.ctx.strokeStyle = COLORS.inProgress;
         this.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
     }
 
