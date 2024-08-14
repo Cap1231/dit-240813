@@ -8,10 +8,12 @@ export class ModalManager {
         this.partNumberModal = document.getElementById('part-number-modal');
         this.partNumberCancelBtn = this.partNumberModal.querySelector('.cancel-btn');
         this.partNumberRegisterBtn = this.partNumberModal.querySelector('.register-btn');
+        this.partNumberInput = document.getElementById('part-number-input');
         // 遷移画面登録モーダル
         this.transitionScreenModal = document.getElementById('transition-screen-modal');
         this.transitionScreenCancelBtn = this.transitionScreenModal.querySelector('.cancel-btn');
-        this.transitionScreenRegisterBtn = this.partNumberModal.querySelector('.register-btn');
+        this.transitionScreenRegisterBtn = this.transitionScreenModal.querySelector('.register-btn');
+        this.transitionScreenInput = document.getElementById('transition-screen-input');
 
         this.modals = document.querySelectorAll('.modal');
         this.rect = null; // 選択されている矩形の相対座標
@@ -33,21 +35,25 @@ export class ModalManager {
         // 部位番号登録モーダル
         this.partNumberCancelBtn.addEventListener('click', () => this.closeModal(this.partNumberModal));
         this.partNumberRegisterBtn.addEventListener('click', () => this.registerPartNumber());
-        const partNumberInput = document.getElementById('part-number-input');
-        partNumberInput.addEventListener('input', () => {
-            if (partNumberInput.value.trim() !== '') {
+        this.partNumberInput.addEventListener('input', () => {
+            if (this.partNumberInput.value.trim() !== '') {
                 this.partNumberRegisterBtn.disabled = false;
             }
         });
         // 遷移画面登録モーダル
         this.transitionScreenCancelBtn.addEventListener('click', () => this.closeModal(this.transitionScreenModal));
         this.transitionScreenRegisterBtn.addEventListener('click', () => this.registerTransitionScreen());
-        const transitionScreenInput = document.getElementById('transition-screen-input');
-        transitionScreenInput.addEventListener('input', () => {
-            if (transitionScreenInput.value.trim() !== '') {
+        this.transitionScreenInput.addEventListener('input', () => {
+            if (this.transitionScreenInput.value.trim() !== '') {
                 this.transitionScreenRegisterBtn.disabled = false;
             }
         });
+    }
+
+    // TODO: 名前要検討。Main的な役割。ActionSelectionModal.execute ?
+    openActionSelectionModal(rect) {
+        this.rect = rect;
+        this.openModal(this.actionSelectionModal)
     }
 
     openModal(targetModal) {
@@ -64,12 +70,6 @@ export class ModalManager {
     closeModal(targetModal) {
         targetModal.style.display = 'none';
         this.modals.forEach(modal => modal.classList.remove('inactive'));
-    }
-
-    // TODO: 名前要検討。Main的な役割。ActionSelectionModal.execute ?
-    openActionSelectionModal(rect) {
-        this.rect = rect;
-        this.openModal(this.actionSelectionModal)
     }
 
     //
@@ -98,13 +98,29 @@ export class ModalManager {
     // 部位番号登録モーダル
     //
     registerPartNumber() {
-        console.log('registerPartNumber');
+        try {
+            console.log('選択している矩形の相対座標:', this.rect);
+            // TODO: API 叩く
+            this.partNumberInput.value = '';
+            this.closeModal(this.partNumberModal)
+            // TODO: 矩形の枠の色を変える
+        } catch (e) {
+            alert('部位番号の登録失敗')
+        }
     }
 
     //
     // 遷移画面登録モーダル
     //
     registerTransitionScreen() {
-        console.log('registerTransitionScreen');
+        try {
+            console.log('選択している矩形の相対座標:', this.rect);
+            // TODO: API 叩く
+            this.transitionScreenInput.value = ''
+            this.closeModal(this.transitionScreenModal)
+            // TODO: 矩形の枠の色を変える
+        } catch (e) {
+            alert('遷移画面の登録失敗')
+        }
     }
 }
