@@ -6,10 +6,11 @@ export class CanvasImageController {
         this.ctx = this.canvas.getContext('2d');
         this.img =  new Image();
         this.imgPos = null; // Canvas内で表示している画像の絶対座標
-        this.rectangles = []; // 選択した矩形たちの絶対座標
-        this.currentRect = null; // 現在選択している矩形の絶対座標
+        this.rectangles = []; // 描画した矩形たちの絶対座標
+        this.currentRect = null; // 現在ドラッグしている矩形の絶対座標
         this.startPos = null; // ドラッグ開始点の絶対座標
         this.isDragging = false;
+        this.onRectSelected = null; // 外部から設定されるイベントハンドラ
 
         this.setupImage(imageUrl);
         this.attachEventListeners();
@@ -82,14 +83,14 @@ export class CanvasImageController {
     }
 
     //
-    // 矩形描画処理中のステート管理
+    // ドラッグしている矩形
     //
-    // 描画されている矩形に新規で描画する矩形を追加
+    // ドラッグした矩形を rectangles に追加
     addCurrentRectangle() {
         this.rectangles.push(this.currentRect);
     }
 
-    // 現在ドラッグで描画している矩形情報を計算する
+    // 現在ドラッグしている矩形情報を計算する
     // x: ドラッグ開始点と現在点のうち、小さい方を x 座標とする
     // y: ドラッグ開始点と現在点のうち、小さい方を y 座標とする
     // width : 始点と現在点の差の絶対値の高さ
@@ -123,6 +124,33 @@ export class CanvasImageController {
         this.startPos = null;
         this.currentRect = null;
         this.isDragging = false;
+    }
+
+    //
+    // 描画した矩形
+    //
+    // 矩形を探す
+    findRectangleAtPosition(x, y) {
+        return this.rectangles.find(rect =>
+            x >= rect.x && x <= rect.x + rect.width &&
+            y >= rect.y && y <= rect.y + rect.height
+        );
+    }
+
+    // 矩形を相対座標(0から1の範囲)に変換する
+    convertToRelativeCoordinates(rect) {
+        // 画像内の相対座標を計算
+        const relativeX = (rect.x - this.imgPos.x) / this.imgPos.width;
+        const relativeY = (rect.y - this.imgPos.y) / this.imgPos.height;
+        const relativeWidth = rect.width / this.imgPos.width;
+        const relativeHeight = rect.height / this.imgPos.height;
+
+        return {
+            x: relativeX,
+            y: relativeY,
+            width: relativeWidth,
+            height: relativeHeight
+        };
     }
 
     //
@@ -162,9 +190,14 @@ export class CanvasImageController {
     // EventListener
     //
     attachEventListeners() {
-        this.canvas.addEventListener('mousedown', e => this.handleMouseDown(e));
+        this.canvas.addEventListener('mousedown', e => {
+            if (e.button === 2) return false; // 右クリックの場合は何もしない
+            this.handleMouseDown(e)
+        });
         this.canvas.addEventListener('mousemove', e => this.handleMouseMove(e));
         this.canvas.addEventListener('mouseup', e => this.handleMouseUp(e));
+        // 右クリックでモーダルを表示
+        this.canvas.addEventListener('contextmenu', e => this.handleContextMenu(e));
     }
 
     handleMouseDown(e) {
@@ -198,5 +231,20 @@ export class CanvasImageController {
         this.addCurrentRectangle()
         this.updateCanvas()
         this.resetDraggingState()
+    }
+
+    // onRectSelected をセットしていない場合、デフォルトのコンテキストメニューを表示し、
+    // セットされている場合は、右クリックした場所にある矩形情報を取得し、onRectSelectedを呼び出す
+    handleContextMenu(e) {
+        if (!this.onRectSelected) return;
+
+        e.preventDefault();  // デフォルトのコンテキストメニューをキャンセル
+
+        const selectedRect = this.findRectangleAtPosition(e.offsetX, e.offsetY);
+        if (!selectedRect) return;
+
+        // 相対座標に変換する
+        const relativeRect = this.convertToRelativeCoordinates(selectedRect);
+        this.onRectSelected(relativeRect);
     }
 }
