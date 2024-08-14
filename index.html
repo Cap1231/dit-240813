@@ -8,42 +8,42 @@
 <body>
   <canvas id="myCanvas"></canvas>
   <!-- Modal Start -->
-  <!-- アクション登録モーダル -->
-  <div id="actionStartModal" class="modal">
+  <!-- アクション選択モーダル -->
+  <div id="action-selection-modal" class="modal">
     <div class="modal-content">
       <h2>操作を選択してください</h2>
       <form>
-        <label><input type="radio" name="registrationType" value="partNumber"> 部位番号登録</label><br>
-        <label><input type="radio" name="registrationType" value="transitionScreen"> 遷移画面登録</label>
-        <div style="text-align: right; margin-top: 20px;">
-          <button type="button" class="cancelButton">取消</button>
-          <button type="button" class="nextButton" disabled>次へ</button>
+        <label><input type="radio" name="selection-type" value="part-number"> 部位番号登録</label><br>
+        <label><input type="radio" name="selection-type" value="transition-screen"> 遷移画面登録</label>
+        <div class="modal-action">
+          <button type="button" class="cancel-btn">取消</button>
+          <button type="button" class="next-btn" disabled>次へ</button>
         </div>
       </form>
     </div>
   </div>
   <!-- 部位番号登録モーダル -->
-  <div id="partNumberModal" class="modal">
+  <div id="part-number-modal" class="modal">
     <div class="modal-content">
       <h2>部位番号登録</h2>
       <form>
         <input type="text" placeholder="部位番号を入力">
-        <div style="text-align: right; margin-top: 20px;">
-          <button type="button" class="cancelButton">取消</button>
-          <button type="button" class="registerButton" disabled>登録</button>
+        <div class="modal-action">
+          <button type="button" class="cancel-btn">取消</button>
+          <button type="button" class="register-btn" disabled>登録</button>
         </div>
       </form>
     </div>
   </div>
   <!-- 遷移画面登録モーダル -->
-  <div id="transitionScreenModal" class="modal">
+  <div id="transition-screen-modal" class="modal">
     <div class="modal-content">
       <h2>遷移画面登録</h2>
       <form>
         <input type="text" placeholder="画面IDを入力">
-        <div style="text-align: right; margin-top: 20px;">
-          <button type="button" class="cancelButton">取消</button>
-          <button type="button" class="registerButton" disabled>登録</button>
+        <div class="modal-action">
+          <button type="button" class="cancel-btn">取消</button>
+          <button type="button" class="register-btn" disabled>登録</button>
         </div>
       </form>
     </div>

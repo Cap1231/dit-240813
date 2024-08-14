@@ -24,15 +24,16 @@
     border-radius: 5px;
     width: 50%;
 }
-
-#actionStartModal .modal-content {
+#action-selection-modal .modal-content {
     margin-top: 15%;
 }
-
-#partNumberModal .modal-content {
+#part-number-modal .modal-content {
     margin-top: 50%;
 }
-
-#transitionScreenModal .modal-content {
+#transition-screen-modal .modal-content {
     margin-top: 50%;
+}
+.modal-content  .modal-action {
+    text-align: right;
+    margin-top: 20px;
 }

@@ -1,35 +1,35 @@
 export class ModalManager {
     constructor() {
-        this.actionStartModal = document.getElementById('actionStartModal'); // モーダルのコンテナ
-        this.actionStartCancelButton = this.actionStartModal.querySelector('.cancelButton');
-        this.actionStartNextButton = this.actionStartModal.querySelector('.nextButton');
+        // アクション選択モーダル
+        this.actionSelectionModal = document.getElementById('action-selection-modal');
+        this.actionSelectionCancelBtn = this.actionSelectionModal.querySelector('.cancel-btn');
+        this.actionSelectionNextBtn = this.actionSelectionModal.querySelector('.next-btn');
+        // 部位番号登録モーダル
+        this.partNumberModal = document.getElementById('part-number-modal');
+        this.partNumberModalCancelBtn = this.partNumberModal.querySelector('.cancel-btn');
+        // 遷移画面登録モーダル
+        this.transitionScreenModal = document.getElementById('transition-screen-modal');
+        this.transitionScreenModalCancelBtn = this.transitionScreenModal.querySelector('.cancel-btn');
 
-        this.partNumberModal = document.getElementById('partNumberModal');
-        this.partNumberModalCancelButton = this.partNumberModal.querySelector('.cancelButton');
-        this.transitionScreenModal = document.getElementById('transitionScreenModal');
-        this.transitionScreenModalCancelButton = this.transitionScreenModal.querySelector('.cancelButton');
-
-        // TODO:  他のModalが利用できないように
         this.modals = document.querySelectorAll('.modal');
-
-        this.rect = null;
+        this.rect = null; // 選択されている矩形の相対座標
 
         this.setupEventListeners();
     }
 
     setupEventListeners() {
-        document.querySelectorAll('input[name="registrationType"]').forEach(input => {
+        document.querySelectorAll('input[name="selection-type"]').forEach(input => {
             input.addEventListener('change', () => {
-                if (document.querySelector('input[name="registrationType"]:checked')) {
-                    this.actionStartNextButton.disabled = false; // 選択されたら「次へ」ボタンを有効化
+                if (document.querySelector('input[name="selection-type"]:checked')) {
+                    this.actionSelectionNextBtn.disabled = false; // 選択されたら「次へ」ボタンを有効化
                 }
             });
         });
+        this.actionSelectionCancelBtn.addEventListener('click', () => this.closeModal(this.actionSelectionModal));
+        this.actionSelectionNextBtn.addEventListener('click', () => this.handleNext());
 
-        this.actionStartNextButton.addEventListener('click', () => this.handleNext());
-        this.actionStartCancelButton.addEventListener('click', () => this.closeModal(this.actionStartModal));
-        this.partNumberModalCancelButton.addEventListener('click', () => this.closeModal(this.partNumberModal));
-        this.transitionScreenModalCancelButton.addEventListener('click', () => this.closeModal(this.transitionScreenModal));
+        this.partNumberModalCancelBtn.addEventListener('click', () => this.closeModal(this.partNumberModal));
+        this.transitionScreenModalCancelBtn.addEventListener('click', () => this.closeModal(this.transitionScreenModal));
     }
 
     openModal(targetModal) {
@@ -50,15 +50,15 @@ export class ModalManager {
 
     openActionStartModal(rect) {
         this.rect = rect;
-        this.openModal(this.actionStartModal)
+        this.openModal(this.actionSelectionModal)
     }
 
     handleNext() {
-        const selectedOption = document.querySelector('input[name="registrationType"]:checked').value;
-        if (selectedOption === 'partNumber') {
+        const selectionType= document.querySelector('input[name="selection-type"]:checked').value;
+        if (selectionType === 'part-number') {
             // 部位番号登録モーダルを開く
             this.openPartNumberModal();
-        } else if (selectedOption === 'transitionScreen') {
+        } else if (selectionType === 'transition-screen') {
             // 遷移画面登録モーダルを開く
             this.openTransitionScreenModal();
         }
