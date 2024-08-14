@@ -1,11 +1,11 @@
 import { CanvasImageController } from "./services/canvasImageController.js";
-import { ModalManager } from "./services/modalManager.js";
+import { ImagePartRegistrationProcess } from "./services/imagePartRegistrationProcess.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvasImageController = new CanvasImageController('myCanvas', '../img/sample1.png');
-    const modalManager = new ModalManager();
+    const imagePartRegistrationProcess = new ImagePartRegistrationProcess();
 
     canvasImageController.onRectSelected = (rect) => {
-        modalManager.openActionSelectionModal(rect);
+        imagePartRegistrationProcess.start(rect);
     };
 });

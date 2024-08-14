@@ -1,19 +1,21 @@
-export class ModalManager {
+// アクション選択 -> 部位番号登録
+// アクション選択 -> 遷移先画像登録
+export class ImagePartRegistrationProcess {
     constructor() {
-        // アクション選択モーダル
+        // アクション選択
         this.actionSelectionModal = document.getElementById('action-selection-modal');
         this.actionSelectionCancelBtn = this.actionSelectionModal.querySelector('.cancel-btn');
         this.actionSelectionNextBtn = this.actionSelectionModal.querySelector('.next-btn');
-        // 部位番号登録モーダル
+        // 部位番号登録
         this.partNumberModal = document.getElementById('part-number-modal');
         this.partNumberCancelBtn = this.partNumberModal.querySelector('.cancel-btn');
         this.partNumberRegisterBtn = this.partNumberModal.querySelector('.register-btn');
         this.partNumberInput = this.partNumberModal.querySelector('#part-number-input');
-        // 遷移画面登録モーダル
-        this.transitionScreenModal = document.getElementById('transition-screen-modal');
-        this.transitionScreenCancelBtn = this.transitionScreenModal.querySelector('.cancel-btn');
-        this.transitionScreenRegisterBtn = this.transitionScreenModal.querySelector('.register-btn');
-        this.transitionScreenInput = this.transitionScreenModal.querySelector('#transition-screen-input');
+        // 遷移先画像登録
+        this.transitionImageModal = document.getElementById('transition-screen-modal');
+        this.transitionImageCancelBtn = this.transitionImageModal.querySelector('.cancel-btn');
+        this.transitionImageRegisterBtn = this.transitionImageModal.querySelector('.register-btn');
+        this.transitionImageInput = this.transitionImageModal.querySelector('#transition-screen-input');
 
         this.modals = document.querySelectorAll('.modal');
         this.rect = null; // 選択されている矩形の相対座標
@@ -22,7 +24,7 @@ export class ModalManager {
     }
 
     setupEventListeners() {
-        // アクション選択モーダル
+        // アクション選択
         this.actionSelectionCancelBtn.addEventListener('click', () => this.closeModal(this.actionSelectionModal));
         this.actionSelectionNextBtn.addEventListener('click', () => this.handleNext());
         document.querySelectorAll('input[name="selection-type"]').forEach(input => {
@@ -32,7 +34,7 @@ export class ModalManager {
                 }
             });
         });
-        // 部位番号登録モーダル
+        // 部位番号登録
         this.partNumberCancelBtn.addEventListener('click', () => this.closeModal(this.partNumberModal));
         this.partNumberRegisterBtn.addEventListener('click', () => this.registerPartNumber());
         this.partNumberInput.addEventListener('input', () => {
@@ -40,18 +42,17 @@ export class ModalManager {
                 this.partNumberRegisterBtn.disabled = false;
             }
         });
-        // 遷移画面登録モーダル
-        this.transitionScreenCancelBtn.addEventListener('click', () => this.closeModal(this.transitionScreenModal));
-        this.transitionScreenRegisterBtn.addEventListener('click', () => this.registerTransitionScreen());
-        this.transitionScreenInput.addEventListener('input', () => {
-            if (this.transitionScreenInput.value.trim() !== '') {
-                this.transitionScreenRegisterBtn.disabled = false;
+        // 遷移先画像登録
+        this.transitionImageCancelBtn.addEventListener('click', () => this.closeModal(this.transitionImageModal));
+        this.transitionImageRegisterBtn.addEventListener('click', () => this.registerTransitionScreen());
+        this.transitionImageInput.addEventListener('input', () => {
+            if (this.transitionImageInput.value.trim() !== '') {
+                this.transitionImageRegisterBtn.disabled = false;
             }
         });
     }
 
-    // TODO: 名前要検討。Main的な役割。ActionSelectionModal.execute ?
-    openActionSelectionModal(rect) {
+    start(rect) {
         this.rect = rect;
         this.openModal(this.actionSelectionModal)
     }
@@ -73,7 +74,7 @@ export class ModalManager {
     }
 
     //
-    // アクション選択モーダル
+    // アクション選択
     //
     handleNext() {
         const selectionType= document.querySelector('input[name="selection-type"]:checked').value;
@@ -91,11 +92,11 @@ export class ModalManager {
     }
 
     openTransitionScreenModal() {
-        this.openModal(this.transitionScreenModal)
+        this.openModal(this.transitionImageModal)
     }
 
     //
-    // 部位番号登録モーダル
+    // 部位番号登録
     //
     registerPartNumber() {
         try {
@@ -110,14 +111,14 @@ export class ModalManager {
     }
 
     //
-    // 遷移画面登録モーダル
+    // 遷移先画像登録
     //
     registerTransitionScreen() {
         try {
             console.log('選択している矩形の相対座標:', this.rect);
             // TODO: API 叩く
-            this.transitionScreenInput.value = ''
-            this.closeModal(this.transitionScreenModal)
+            this.transitionImageInput.value = ''
+            this.closeModal(this.transitionImageModal)
             // TODO: 矩形の枠の色を変える
         } catch (e) {
             alert('遷移画面の登録失敗')
