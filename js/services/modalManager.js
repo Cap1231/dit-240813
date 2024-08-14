@@ -8,12 +8,12 @@ export class ModalManager {
         this.partNumberModal = document.getElementById('part-number-modal');
         this.partNumberCancelBtn = this.partNumberModal.querySelector('.cancel-btn');
         this.partNumberRegisterBtn = this.partNumberModal.querySelector('.register-btn');
-        this.partNumberInput = document.getElementById('part-number-input');
+        this.partNumberInput = this.partNumberModal.querySelector('#part-number-input');
         // 遷移画面登録モーダル
         this.transitionScreenModal = document.getElementById('transition-screen-modal');
         this.transitionScreenCancelBtn = this.transitionScreenModal.querySelector('.cancel-btn');
         this.transitionScreenRegisterBtn = this.transitionScreenModal.querySelector('.register-btn');
-        this.transitionScreenInput = document.getElementById('transition-screen-input');
+        this.transitionScreenInput = this.transitionScreenModal.querySelector('#transition-screen-input');
 
         this.modals = document.querySelectorAll('.modal');
         this.rect = null; // 選択されている矩形の相対座標
