@@ -6,6 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalManager = new ModalManager();
 
     canvasImageController.onRectSelected = (rect) => {
-        modalManager.openActionStartModal(rect);
+        modalManager.openActionSelectionModal(rect);
     };
 });
