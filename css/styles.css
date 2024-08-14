@@ -2,3 +2,37 @@
     border: 1px solid #c0c0c0;
     background-color: #e8e8e8;
 }
+
+/* Modal */
+.modal {
+    display:none;
+    position:fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background-color:rgba(0,0,0,0.5);
+}
+.modal.inactive {
+    pointer-events: none; /* ユーザーのインタラクションを無効にする */
+    opacity: 0.5; /* 視覚的に非アクティブ状態を示す */
+}
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 50%;
+}
+
+#actionStartModal .modal-content {
+    margin-top: 15%;
+}
+
+#partNumberModal .modal-content {
+    margin-top: 50%;
+}
+
+#transitionScreenModal .modal-content {
+    margin-top: 50%;
+}

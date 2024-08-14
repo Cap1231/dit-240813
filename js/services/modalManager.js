@@ -2,7 +2,7 @@ export class ModalManager {
     constructor() {
         this.actionStartModal = document.getElementById('actionStartModal'); // モーダルのコンテナ
         this.actionStartCancelButton = this.actionStartModal.querySelector('.cancelButton');
-        this.nextButton = this.actionStartModal.querySelector('.nextButton');
+        this.actionStartNextButton = this.actionStartModal.querySelector('.nextButton');
 
         this.partNumberModal = document.getElementById('partNumberModal');
         this.partNumberModalCancelButton = this.partNumberModal.querySelector('.cancelButton');
@@ -10,7 +10,7 @@ export class ModalManager {
         this.transitionScreenModalCancelButton = this.transitionScreenModal.querySelector('.cancelButton');
 
         // TODO:  他のModalが利用できないように
-        // this.modals = document.querySelectorAll('.modal');
+        this.modals = document.querySelectorAll('.modal');
 
         this.rect = null;
 
@@ -21,34 +21,31 @@ export class ModalManager {
         document.querySelectorAll('input[name="registrationType"]').forEach(input => {
             input.addEventListener('change', () => {
                 if (document.querySelector('input[name="registrationType"]:checked')) {
-                    this.nextButton.disabled = false; // 選択されたら「次へ」ボタンを有効化
+                    this.actionStartNextButton.disabled = false; // 選択されたら「次へ」ボタンを有効化
                 }
             });
         });
 
-        this.nextButton.addEventListener('click', () => this.handleNext());
+        this.actionStartNextButton.addEventListener('click', () => this.handleNext());
         this.actionStartCancelButton.addEventListener('click', () => this.closeModal(this.actionStartModal));
         this.partNumberModalCancelButton.addEventListener('click', () => this.closeModal(this.partNumberModal));
         this.transitionScreenModalCancelButton.addEventListener('click', () => this.closeModal(this.transitionScreenModal));
     }
 
     openModal(targetModal) {
-        targetModal.style.display = 'block';
-        // TODO:  他のModalが利用できないように
-        // this.modals.forEach(modal => {
-        //     if (modal === targetModal) {
-        //         modal.style.display = 'block';
-        //         modal.classList.remove('inactive');
-        //     } else {
-        //         modal.classList.add('inactive');
-        //     }
-        // });
+        this.modals.forEach(modal => {
+            if (modal === targetModal) {
+                modal.style.display = 'block';
+                modal.classList.remove('inactive');
+            } else {
+                modal.classList.add('inactive');
+            }
+        });
     }
 
     closeModal(targetModal) {
         targetModal.style.display = 'none';
-        // TODO:  他のModalが利用できないように
-        // this.modals.forEach(modal => modal.classList.remove('inactive'));
+        this.modals.forEach(modal => modal.classList.remove('inactive'));
     }
 
     openActionStartModal(rect) {
