@@ -97,6 +97,7 @@ export class CanvasImageController {
     // height: 始点と現在点の差の絶対値の幅
     calcCurrentRectangle(e) {
         this.currentRect = {
+            ...this.currentRect,
             x: Math.min(this.startPos.x, e.offsetX),
             y: Math.min(this.startPos.y, e.offsetY),
             width: Math.abs(e.offsetX - this.startPos.x),
@@ -114,7 +115,9 @@ export class CanvasImageController {
             x: e.offsetX,
             y: e.offsetY,
             width: 0,
-            height: 0
+            height: 0,
+            partNumberRegistered: false,
+            transitionImageRegistered: false
         }
         this.isDragging = true;
     }
@@ -229,13 +232,14 @@ export class CanvasImageController {
         }
 
         this.addCurrentRectangle()
+        console.log(this.currentRect)
         this.updateCanvas()
         this.resetDraggingState()
     }
 
     // onRectSelected をセットしていない場合、デフォルトのコンテキストメニューを表示し、
     // セットされている場合は、右クリックした場所にある矩形情報を取得し、onRectSelectedを呼び出す
-    handleContextMenu(e) {
+    async handleContextMenu(e) {
         if (!this.onRectSelected) return;
 
         e.preventDefault();  // デフォルトのコンテキストメニューをキャンセル
@@ -245,6 +249,12 @@ export class CanvasImageController {
 
         // 相対座標に変換する
         const relativeRect = this.convertToRelativeCoordinates(selectedRect);
-        this.onRectSelected(relativeRect);
+
+        try {
+            const registeredStatus = await this.onRectSelected(relativeRect);
+            console.log('登録状態:', registeredStatus);
+        } catch (error) {
+            console.error('エラーが発生しました:', error);
+        }
     }
 }

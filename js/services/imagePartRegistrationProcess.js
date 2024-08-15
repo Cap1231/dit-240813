@@ -19,6 +19,11 @@ export class ImagePartRegistrationProcess {
 
         this.modals = document.querySelectorAll('.modal');
         this.rect = null; // 選択されている矩形の相対座標
+        this.registeredStatus = {
+            partNumberRegistered: false,
+            transitionImageRegistered: false
+        }
+        this.onModalClose = null;  // モーダルが正常に閉じられた場合に呼び出すコールバック
 
         this.setupEventListeners();
     }
@@ -55,6 +60,13 @@ export class ImagePartRegistrationProcess {
     start(rect) {
         this.rect = rect;
         this.openModal(this.actionSelectionModal)
+        console.log(this.registeredStatus)
+        return new Promise((resolve, reject) => {
+            // モーダルが正常に閉じられた場合にresolveを呼び出す
+            this.onModalClose = () => {
+                resolve(this.registeredStatus);
+            };
+        });
     }
 
     openModal(targetModal) {
@@ -71,6 +83,9 @@ export class ImagePartRegistrationProcess {
     closeModal(targetModal) {
         targetModal.style.display = 'none';
         this.modals.forEach(modal => modal.classList.remove('inactive'));
+
+        // すべてのモーダルが閉じているか確認
+        // if (this.onModalClose) this.onModalClose();
     }
 
     //
@@ -105,6 +120,8 @@ export class ImagePartRegistrationProcess {
             this.partNumberInput.value = '';
             this.closeModal(this.partNumberModal)
             // TODO: 矩形の枠の色を変える
+            // すべてのモーダルが閉じているか確認
+            if (this.onModalClose) this.onModalClose();
         } catch (e) {
             alert('部位番号の登録失敗')
         }
@@ -120,6 +137,8 @@ export class ImagePartRegistrationProcess {
             this.transitionImageInput.value = ''
             this.closeModal(this.transitionImageModal)
             // TODO: 矩形の枠の色を変える
+            // すべてのモーダルが閉じているか確認
+            if (this.onModalClose) this.onModalClose();
         } catch (e) {
             alert('遷移画面の登録失敗')
         }
