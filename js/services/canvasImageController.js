@@ -221,13 +221,13 @@ export class CanvasImageController {
 
         // 矩形が画像内にあるかチェック
         if (!this.checkWithinImage()) {
-            this.handleRectangleCreationError('Error: 画像の範囲外を選択しています');
+            this.handleRectangleCreationError('画像の範囲外を選択しています！');
             return;
         }
 
         // 矩形の重複チェック
         if (this.checkOverlap()) {
-            this.handleRectangleCreationError('Error: 重複しました');
+            this.handleRectangleCreationError('描画範囲が重複しています！');
             return;
         }
 
