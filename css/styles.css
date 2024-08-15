@@ -5,13 +5,13 @@
 
 /* Modal */
 .modal {
-    display:none;
-    position:fixed;
-    left:0;
-    top:0;
-    width:100%;
-    height:100%;
-    background-color:rgba(0,0,0,0.5);
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
 }
 .modal.inactive {
     pointer-events: none; /* ユーザーのインタラクションを無効にする */
@@ -28,10 +28,10 @@
     margin-top: 15%;
 }
 #part-number-modal .modal-content {
-    margin-top: 50%;
+    margin-top: 20%;
 }
 #transition-screen-modal .modal-content {
-    margin-top: 50%;
+    margin-top: 20%;
 }
 .modal-content  .modal-action {
     text-align: right;
