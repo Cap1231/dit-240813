@@ -82,10 +82,14 @@ export class ImagePartRegistrationProcess {
 
     closeModal(targetModal) {
         targetModal.style.display = 'none';
+        // TODO：ロジック要見直し
         this.modals.forEach(modal => modal.classList.remove('inactive'));
+    }
 
-        // すべてのモーダルが閉じているか確認
-        // if (this.onModalClose) this.onModalClose();
+    closeAllModals() {
+        this.closeModal(this.actionSelectionModal)
+        this.closeModal(this.partNumberModal)
+        this.closeModal(this.transitionImageModal)
     }
 
     //
@@ -118,7 +122,7 @@ export class ImagePartRegistrationProcess {
             console.log('選択している矩形の相対座標:', this.rect);
             // TODO: API 叩く
             this.partNumberInput.value = '';
-            this.closeModal(this.partNumberModal)
+            this.closeAllModals()
             // TODO: 矩形の枠の色を変える
             // すべてのモーダルが閉じているか確認
             if (this.onModalClose) this.onModalClose();
@@ -135,7 +139,7 @@ export class ImagePartRegistrationProcess {
             console.log('選択している矩形の相対座標:', this.rect);
             // TODO: API 叩く
             this.transitionImageInput.value = ''
-            this.closeModal(this.transitionImageModal)
+            this.closeAllModals()
             // TODO: 矩形の枠の色を変える
             // すべてのモーダルが閉じているか確認
             if (this.onModalClose) this.onModalClose();
