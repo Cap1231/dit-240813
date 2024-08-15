@@ -58,7 +58,12 @@ export class ImagePartRegistrationProcess {
     }
 
     start(rect) {
+        // TODO: 必要なrectの情報だけ
         this.rect = rect;
+        this.registeredStatus = {
+            partNumberRegistered: rect.partNumberRegistered,
+            transitionImageRegistered: rect.transitionImageRegistered,
+        }
         this.openModal(this.actionSelectionModal)
         console.log(this.registeredStatus)
         return new Promise((resolve, reject) => {
@@ -124,10 +129,11 @@ export class ImagePartRegistrationProcess {
             this.partNumberInput.value = '';
             this.closeAllModals()
             // TODO: 矩形の枠の色を変える
-            // すべてのモーダルが閉じているか確認
+            this.registeredStatus.partNumberRegistered = true
             if (this.onModalClose) this.onModalClose();
-        } catch (e) {
+        } catch (err) {
             alert('部位番号の登録失敗')
+            throw err;
         }
     }
 
@@ -141,10 +147,11 @@ export class ImagePartRegistrationProcess {
             this.transitionImageInput.value = ''
             this.closeAllModals()
             // TODO: 矩形の枠の色を変える
-            // すべてのモーダルが閉じているか確認
+            this.registeredStatus.transitionImageRegistered = true
             if (this.onModalClose) this.onModalClose();
-        } catch (e) {
+        } catch (err) {
             alert('遷移画面の登録失敗')
+            throw err;
         }
     }
 }

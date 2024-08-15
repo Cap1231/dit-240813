@@ -149,6 +149,7 @@ export class CanvasImageController {
         const relativeHeight = rect.height / this.imgPos.height;
 
         return {
+            ...rect,
             x: relativeX,
             y: relativeY,
             width: relativeWidth,
@@ -252,9 +253,12 @@ export class CanvasImageController {
 
         try {
             const registeredStatus = await this.onRectSelected(relativeRect);
+            selectedRect.partNumberRegistered = registeredStatus.partNumberRegistered;
+            selectedRect.transitionImageRegistered = registeredStatus.transitionImageRegistered;
+            console.log(this.rectangles)
             console.log('登録状態:', registeredStatus);
-        } catch (error) {
-            console.error('エラーが発生しました:', error);
+        } catch (err) {
+            console.error('Registration Error:', err);
         }
     }
 }
