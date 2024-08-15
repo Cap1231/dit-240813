@@ -185,7 +185,7 @@ export class CanvasImageController {
     // ErrorHandler
     //
     handleRectangleCreationError(message) {
-        alert(message);
+        if (message) alert(message);
         this.updateCanvas()
         this.resetDraggingState()
     }
@@ -219,6 +219,12 @@ export class CanvasImageController {
 
     handleMouseUp(e) {
         if (!this.isDragging || !this.currentRect) return;
+
+        // 高さと幅が無い矩形は登録しない
+        if (this.currentRect.width === 0 || this.currentRect.height === 0) {
+            this.handleRectangleCreationError(null);
+            return;
+        };
 
         // 矩形が画像内にあるかチェック
         if (!this.checkWithinImage()) {
