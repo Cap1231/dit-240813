@@ -128,7 +128,6 @@ export class ImagePartRegistrationProcess {
             // TODO: API 叩く
             this.partNumberInput.value = '';
             this.closeAllModals()
-            // TODO: 矩形の枠の色を変える
             this.registeredStatus.partNumberRegistered = true
             if (this.onModalClose) this.onModalClose();
         } catch (err) {
@@ -146,7 +145,6 @@ export class ImagePartRegistrationProcess {
             // TODO: API 叩く
             this.transitionImageInput.value = ''
             this.closeAllModals()
-            // TODO: 矩形の枠の色を変える
             this.registeredStatus.transitionImageRegistered = true
             if (this.onModalClose) this.onModalClose();
         } catch (err) {

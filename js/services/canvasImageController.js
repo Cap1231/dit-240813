@@ -68,7 +68,8 @@ export class CanvasImageController {
     // Canvas内の矩形描画
     //
     drawRectangle(rect) {
-        this.ctx.strokeStyle = COLORS.inProgress;
+        const allRegistered = rect.partNumberRegistered && rect.transitionImageRegistered;
+        this.ctx.strokeStyle = allRegistered ? COLORS.registered : COLORS.inProgress;
         this.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
     }
 
@@ -261,8 +262,8 @@ export class CanvasImageController {
             const registeredStatus = await this.onRectSelected(relativeRect);
             selectedRect.partNumberRegistered = registeredStatus.partNumberRegistered;
             selectedRect.transitionImageRegistered = registeredStatus.transitionImageRegistered;
+            this.updateCanvas()
             console.log(this.rectangles)
-            console.log('登録状態:', registeredStatus);
         } catch (err) {
             console.error('Registration Error:', err);
         }
