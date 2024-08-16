@@ -132,6 +132,7 @@ export class ImagePartRegistrationProcess {
     // 登録成功後の処理
     afterRegistrationSuccess() {
         this.resetInputFields()
+        this.resetActionSelectionModal()
         this.closeAllModals()
         if (this.onRegistrationSuccess) this.onRegistrationSuccess()
     }
@@ -143,6 +144,7 @@ export class ImagePartRegistrationProcess {
 
     // 登録キャンセル時の処理
     afterRegistrationCancel() {
+        this.resetActionSelectionModal()
         this.closeAllModals()
         if (this.onRegistrationSuccess) this.onRegistrationSuccess()
     }
@@ -151,15 +153,26 @@ export class ImagePartRegistrationProcess {
     // 入力値のクリア
     //
     resetInputFields() {
+        // テキスト入力フィールドをクリア
         this.partNumberInput.value = ''
         this.transitionImageInput.value = ''
+    }
+
+    resetActionSelectionModal() {
+        // ラジオボタンの選択を解除
+        this.actionSelectionModal.querySelectorAll('input[name="selection-type"]').forEach(radio => {
+            radio.checked = false;
+        });
+
+        // 次へボタンを無効化
+        this.actionSelectionNextBtn.disabled = true;
     }
 
     //
     // アクション選択モーダル
     //
     handleNext() {
-        const selectionType= document.querySelector('input[name="selection-type"]:checked').value;
+        const selectionType= this.actionSelectionModal.querySelector('input[name="selection-type"]:checked').value;
         if (selectionType === 'part-number') {
             this.openPartNumberModal();
         } else if (selectionType === 'transition-image') {
