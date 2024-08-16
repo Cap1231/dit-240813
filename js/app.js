@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const imagePartRegistrationProcess = new ImagePartRegistrationProcess();
 
     canvasImageController.onRectSelected = async (rect) => {
-        const updatedRect = await imagePartRegistrationProcess.start(rect)
-        return updatedRect
+        const processedRect = await imagePartRegistrationProcess.start(rect)
+        return processedRect
     };
 });
