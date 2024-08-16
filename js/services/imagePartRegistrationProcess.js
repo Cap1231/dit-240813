@@ -13,10 +13,10 @@ export class ImagePartRegistrationProcess {
         this.partNumberRegisterBtn = this.partNumberModal.querySelector('.register-btn');
         this.partNumberInput = this.partNumberModal.querySelector('#part-number-input');
         // 遷移先画像登録
-        this.transitionImageModal = document.getElementById('transition-screen-modal');
+        this.transitionImageModal = document.getElementById('transition-image-modal');
         this.transitionImageCancelBtn = this.transitionImageModal.querySelector('.cancel-btn');
         this.transitionImageRegisterBtn = this.transitionImageModal.querySelector('.register-btn');
-        this.transitionImageInput = this.transitionImageModal.querySelector('#transition-screen-input');
+        this.transitionImageInput = this.transitionImageModal.querySelector('#transition-image-input');
 
         this.rect = null; // 選択している矩形の相対座標と登録ステータスを管理するステート
 
@@ -156,11 +156,9 @@ export class ImagePartRegistrationProcess {
     handleNext() {
         const selectionType= document.querySelector('input[name="selection-type"]:checked').value;
         if (selectionType === 'part-number') {
-            // 部位番号登録モーダルを開く
             this.openPartNumberModal();
-        } else if (selectionType === 'transition-screen') {
-            // 遷移画面登録モーダルを開く
-            this.openTransitionScreenModal();
+        } else if (selectionType === 'transition-image') {
+            this.openTransitionImageModal();
         }
     }
 
@@ -168,7 +166,7 @@ export class ImagePartRegistrationProcess {
         this.openModal(this.partNumberModal)
     }
 
-    openTransitionScreenModal() {
+    openTransitionImageModal() {
         this.openModal(this.transitionImageModal)
     }
 
