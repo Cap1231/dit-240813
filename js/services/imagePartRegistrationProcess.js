@@ -95,6 +95,11 @@ export class ImagePartRegistrationProcess {
         }
     }
 
+    // 登録ステータスを更新する関数
+    updateDeletedStatus() {
+        this.rect.deleted = true
+    }
+
     //
     // モーダル開閉
     //
@@ -159,6 +164,8 @@ export class ImagePartRegistrationProcess {
             this.openPartNumberModal();
         } else if (selectionType === 'transition-image') {
             this.openTransitionImageModal();
+        } else if (selectionType === 'delete-rect') {
+            this.deleteRect();
         }
     }
 
@@ -196,6 +203,17 @@ export class ImagePartRegistrationProcess {
             this.afterRegistrationSuccess()
         } catch (err) {
             console.error('遷移先画像の登録失敗', err)
+            this.afterRegistrationFailure(err)
+        }
+    }
+
+    deleteRect() {
+        try {
+            // TODO: this.rect を利用して、矩形削除 APIを叩く
+            this.updateDeletedStatus()
+            this.afterRegistrationSuccess()
+        } catch (err) {
+            console.error('矩形削除失敗', err)
             this.afterRegistrationFailure(err)
         }
     }

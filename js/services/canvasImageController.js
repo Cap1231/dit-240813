@@ -141,6 +141,22 @@ export class CanvasImageController {
         );
     }
 
+    // 矩形を削除
+    deleteRectangle(rect) {
+        // TODO：要検討。ID 比較が必要？
+        this.rectangles = this.rectangles.filter(r => r !== rect);
+    }
+
+
+    // ImagePartRegistrationProcess で処理した矩形情報をsourceRectを更新
+    updateRectangle(sourceRect, processedRect) {
+        if (processedRect.deleted === true) {
+            this.deleteRectangle(sourceRect)
+        } else {
+            this.updateRectangleStatus(sourceRect, processedRect)
+        }
+    }
+
     // ImagePartRegistrationProcess で処理した矩形データで元の矩形データを更新
     updateRectangleStatus(sourceRect, processedRect) {
         sourceRect.partNumberRegistered = processedRect.partNumberRegistered;
@@ -160,6 +176,7 @@ export class CanvasImageController {
             height: relativeRect.height,
             partNumberRegistered: rect.partNumberRegistered,
             transitionImageRegistered: rect.transitionImageRegistered,
+            deleted: false,
         }
     }
 
@@ -281,7 +298,7 @@ export class CanvasImageController {
 
         try {
             const processedRect = await this.onRectSelected(formattedRect)
-            this.updateRectangleStatus(selectedRect, processedRect)
+            this.updateRectangle(selectedRect, processedRect)
             this.updateCanvas()
             console.log('登録後の矩形情報一覧', this.rectangles)
         } catch (err) {
