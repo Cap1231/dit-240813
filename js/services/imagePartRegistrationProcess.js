@@ -18,11 +18,7 @@ export class ImagePartRegistrationProcess {
         this.transitionImageRegisterBtn = this.transitionImageModal.querySelector('.register-btn');
         this.transitionImageInput = this.transitionImageModal.querySelector('#transition-screen-input');
 
-        this.rect = null; // 選択されている矩形の相対座標
-        this.registeredStatus = {
-            partNumberRegistered: false,
-            transitionImageRegistered: false
-        }
+        this.rect = null; // 選択している矩形の相対座標と登録ステータスを管理するステート
 
         this.onRegistrationSuccess = null // 登録成功時に呼び出すコールバック
         this.onRegistrationFailure = null // 登録失敗時に呼び出すコールバック
@@ -77,19 +73,15 @@ export class ImagePartRegistrationProcess {
         }
     }
 
-    start(rect) {
-        // TODO: 必要なrectの情報だけ
-        this.rect = rect;
-        this.registeredStatus = {
-            partNumberRegistered: rect.partNumberRegistered,
-            transitionImageRegistered: rect.transitionImageRegistered,
-        }
+    start(targetRect) {
+        this.rect = targetRect
         this.openModal(this.actionSelectionModal)
 
-        // モーダルが正常に閉じられた場合に this.registeredStatus を返す
-        // APIでエラーになった場合は、reject ではなく、エラーを投げる
+        // 登録成功時、this.rect を返す
+        // 登録失敗時、error を投げる
+        // 登録キャンセル時、this.rect を返す
         return new Promise((resolve, reject) => {
-            this.onRegistrationSuccess = () => resolve(this.registeredStatus);
+            this.onRegistrationSuccess = () => resolve(this.rect);
             this.onRegistrationFailure = (error) => reject(error);
         });
     }
@@ -97,9 +89,9 @@ export class ImagePartRegistrationProcess {
     // 登録ステータスを更新する関数
     updateRegisteredStatus(type) {
         if (type === 'partNumber') {
-            this.registeredStatus.partNumberRegistered = true
+            this.rect.partNumberRegistered = true
         } else if (type === 'transitionImage') {
-            this.registeredStatus.transitionImageRegistered = true
+            this.rect.transitionImageRegistered = true
         }
     }
 

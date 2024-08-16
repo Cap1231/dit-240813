@@ -258,10 +258,10 @@ export class CanvasImageController {
         const relativeRect = this.convertToRelativeCoordinates(selectedRect);
 
         try {
-            const registeredStatus = await this.onRectSelected(relativeRect)
+            const updatedRect = await this.onRectSelected(relativeRect)
             // TODO: State 更新処理は要検討
-            selectedRect.partNumberRegistered = registeredStatus.partNumberRegistered;
-            selectedRect.transitionImageRegistered = registeredStatus.transitionImageRegistered;
+            selectedRect.partNumberRegistered = updatedRect.partNumberRegistered;
+            selectedRect.transitionImageRegistered = updatedRect.transitionImageRegistered;
             this.updateCanvas()
             console.log('登録後の矩形情報一覧', this.rectangles)
         } catch (err) {
