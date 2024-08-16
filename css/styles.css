@@ -3,7 +3,7 @@
     background-color: #e8e8e8;
 }
 
-/* Modal */
+/* モーダル */
 .modal {
     display: none;
     position: fixed;
@@ -36,4 +36,11 @@
 .modal-content  .modal-action {
     text-align: right;
     margin-top: 20px;
+}
+/* アクション選択モーダル */
+#action-selection-modal label {
+    display: block;
+}
+#action-selection-modal input[type="radio"] {
+    margin-right: 8px;
 }
