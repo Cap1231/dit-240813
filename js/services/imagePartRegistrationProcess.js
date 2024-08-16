@@ -37,13 +37,7 @@ export class ImagePartRegistrationProcess {
         // アクション選択
         this.actionSelectionCancelBtn.addEventListener('click', () => this.cancelRegistration());
         this.actionSelectionNextBtn.addEventListener('click', () => this.handleNext());
-        document.querySelectorAll('input[name="selection-type"]').forEach(input => {
-            input.addEventListener('change', () => {
-                if (document.querySelector('input[name="selection-type"]:checked')) {
-                    this.actionSelectionNextBtn.disabled = false; // 選択されたら「次へ」ボタンを有効化
-                }
-            });
-        });
+        this.setupSelectionTypeListeners()
         // 部位番号登録
         this.partNumberCancelBtn.addEventListener('click', () => this.closeModal(this.partNumberModal));
         this.partNumberRegisterBtn.addEventListener('click', () => this.registerPartNumber());
@@ -58,7 +52,23 @@ export class ImagePartRegistrationProcess {
         });
     }
 
-    // 入力の有無に応じてボタンの有効/無効を切り替える関数
+    // ラジオボタンの選択状態に応じて「次へ」ボタンを有効化する
+    setupSelectionTypeListeners() {
+        const selectionInputs = this.actionSelectionModal.querySelectorAll('input[name="selection-type"]');
+        selectionInputs.forEach(input => {
+            input.addEventListener('change', () => this.enableNextButtonOnSelection())
+        })
+    }
+
+    enableNextButtonOnSelection() {
+        if (document.querySelector('input[name="selection-type"]:checked')) {
+            this.actionSelectionNextBtn.disabled = false;
+        } else {
+            this.actionSelectionNextBtn.disabled = true;
+        }
+    }
+
+    // 入力の有無に応じてボタンの有効/無効を切り替える
     enableRegisterBtnBasedOnInput(inputElement, buttonElement) {
         if (inputElement.value.trim() !== '') {
             buttonElement.disabled = false;
