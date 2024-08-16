@@ -13,7 +13,7 @@ export class CanvasImageController {
         this.onRectSelected = null; // 外部から設定されるイベントハンドラ
 
         this.setupImage(imageUrl);
-        this.attachEventListeners();
+        this.setupEventListeners();
     }
 
     setupImage(imageUrl) {
@@ -194,7 +194,7 @@ export class CanvasImageController {
     //
     // EventListener
     //
-    attachEventListeners() {
+    setupEventListeners() {
         this.canvas.addEventListener('mousedown', e => {
             if (e.button === 2) return false; // 右クリックの場合は何もしない
             this.handleMouseDown(e)

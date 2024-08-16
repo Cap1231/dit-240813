@@ -30,6 +30,9 @@ export class ImagePartRegistrationProcess {
         this.setupEventListeners();
     }
 
+    //
+    // EventListener
+    //
     setupEventListeners() {
         // アクション選択
         this.actionSelectionCancelBtn.addEventListener('click', () => this.cancelRegistration());
@@ -45,18 +48,23 @@ export class ImagePartRegistrationProcess {
         this.partNumberCancelBtn.addEventListener('click', () => this.closeModal(this.partNumberModal));
         this.partNumberRegisterBtn.addEventListener('click', () => this.registerPartNumber());
         this.partNumberInput.addEventListener('input', () => {
-            if (this.partNumberInput.value.trim() !== '') {
-                this.partNumberRegisterBtn.disabled = false;
-            }
+            this.enableRegisterBtnBasedOnInput(this.partNumberInput, this.partNumberRegisterBtn)
         });
         // 遷移先画像登録
         this.transitionImageCancelBtn.addEventListener('click', () => this.closeModal(this.transitionImageModal));
         this.transitionImageRegisterBtn.addEventListener('click', () => this.registerTransitionImage());
         this.transitionImageInput.addEventListener('input', () => {
-            if (this.transitionImageInput.value.trim() !== '') {
-                this.transitionImageRegisterBtn.disabled = false;
-            }
+            this.enableRegisterBtnBasedOnInput(this.transitionImageInput, this.transitionImageRegisterBtn)
         });
+    }
+
+    // 入力の有無に応じてボタンの有効/無効を切り替える関数
+    enableRegisterBtnBasedOnInput(inputElement, buttonElement) {
+        if (inputElement.value.trim() !== '') {
+            buttonElement.disabled = false;
+        } else {
+            buttonElement.disabled = true;
+        }
     }
 
     start(rect) {
