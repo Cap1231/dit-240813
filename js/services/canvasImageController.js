@@ -10,7 +10,7 @@ export class CanvasImageController {
         this.currentRect = null; // 現在ドラッグしている矩形の絶対座標
         this.startPos = null; // ドラッグ開始点の絶対座標
         this.isDragging = false;
-        this.onRectSelected = null; // 外部から設定されるイベントハンドラ
+        this.onRectSelected = null; // 矩形を右クリック押下時に呼び出すコールバック(外部から設定)
 
         this.setupImage(imageUrl);
         this.setupEventListeners();
@@ -141,21 +141,43 @@ export class CanvasImageController {
         );
     }
 
-    // 矩形を相対座標(0から1の範囲)に変換する
+    // ImagePartRegistrationProcess で処理した矩形データで元の矩形データを更新
+    updateRectangleStatus(sourceRect, processedRect) {
+        sourceRect.partNumberRegistered = processedRect.partNumberRegistered;
+        sourceRect.transitionImageRegistered = processedRect.transitionImageRegistered;
+    }
+
+    //
+    // ImagePartRegistrationProcess 用
+    //
+    // ImagePartRegistrationProcess で利用できる形に変換する
+    formatRectangle(rect) {
+        const relativeRect = this.convertToRelativeCoordinates(rect)
+        return {
+            x: relativeRect.x,
+            y: relativeRect.y,
+            width: relativeRect.width,
+            height: relativeRect.height,
+            partNumberRegistered: rect.partNumberRegistered,
+            transitionImageRegistered: rect.transitionImageRegistered,
+        }
+    }
+
+    // 矩形を相対座標に変換する
+    // 相対座標は、0 ~ 1 (特に小数点以下を丸めていない)
     convertToRelativeCoordinates(rect) {
-        // 画像内の相対座標を計算
+        // 画像の左上からの矩形の相対座標を計算
         const relativeX = (rect.x - this.imgPos.x) / this.imgPos.width;
         const relativeY = (rect.y - this.imgPos.y) / this.imgPos.height;
         const relativeWidth = rect.width / this.imgPos.width;
         const relativeHeight = rect.height / this.imgPos.height;
 
         return {
-            ...rect,
             x: relativeX,
             y: relativeY,
             width: relativeWidth,
             height: relativeHeight
-        };
+        }
     }
 
     //
@@ -254,14 +276,12 @@ export class CanvasImageController {
         const selectedRect = this.findRectangleAtPosition(e.offsetX, e.offsetY);
         if (!selectedRect) return;
 
-        // 相対座標に変換する
-        const relativeRect = this.convertToRelativeCoordinates(selectedRect);
+        // ImagePartRegistrationProcess で利用できる形に変換する
+        const formattedRect = this.formatRectangle(selectedRect)
 
         try {
-            const updatedRect = await this.onRectSelected(relativeRect)
-            // TODO: State 更新処理は要検討
-            selectedRect.partNumberRegistered = updatedRect.partNumberRegistered;
-            selectedRect.transitionImageRegistered = updatedRect.transitionImageRegistered;
+            const processedRect = await this.onRectSelected(formattedRect)
+            this.updateRectangleStatus(selectedRect, processedRect)
             this.updateCanvas()
             console.log('登録後の矩形情報一覧', this.rectangles)
         } catch (err) {
