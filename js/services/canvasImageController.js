@@ -240,7 +240,6 @@ export class CanvasImageController {
         }
 
         this.addCurrentRectangle()
-        console.log(this.currentRect)
         this.updateCanvas()
         this.resetDraggingState()
     }
@@ -250,7 +249,7 @@ export class CanvasImageController {
     async handleContextMenu(e) {
         if (!this.onRectSelected) return;
 
-        e.preventDefault();  // デフォルトのコンテキストメニューをキャンセル
+        e.preventDefault()  // デフォルトのコンテキストメニューをキャンセル
 
         const selectedRect = this.findRectangleAtPosition(e.offsetX, e.offsetY);
         if (!selectedRect) return;
@@ -259,13 +258,14 @@ export class CanvasImageController {
         const relativeRect = this.convertToRelativeCoordinates(selectedRect);
 
         try {
-            const registeredStatus = await this.onRectSelected(relativeRect);
+            const registeredStatus = await this.onRectSelected(relativeRect)
+            // TODO: State 更新処理は要検討
             selectedRect.partNumberRegistered = registeredStatus.partNumberRegistered;
             selectedRect.transitionImageRegistered = registeredStatus.transitionImageRegistered;
             this.updateCanvas()
-            console.log(this.rectangles)
+            console.log('登録後の矩形情報一覧', this.rectangles)
         } catch (err) {
-            console.error('Registration Error:', err);
+            console.error('部位番号 or 遷移先画像の登録失敗', err);
         }
     }
 }

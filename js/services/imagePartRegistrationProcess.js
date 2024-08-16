@@ -23,14 +23,16 @@ export class ImagePartRegistrationProcess {
             partNumberRegistered: false,
             transitionImageRegistered: false
         }
-        this.onModalClose = null;  // モーダルが正常に閉じられた場合に呼び出すコールバック
+
+        this.onRegistrationSuccess = null // 登録成功時に呼び出すコールバック
+        this.onRegistrationFailure = null // 登録失敗時に呼び出すコールバック
 
         this.setupEventListeners();
     }
 
     setupEventListeners() {
         // アクション選択
-        this.actionSelectionCancelBtn.addEventListener('click', () => this.closeModal(this.actionSelectionModal));
+        this.actionSelectionCancelBtn.addEventListener('click', () => this.cancelRegistration());
         this.actionSelectionNextBtn.addEventListener('click', () => this.handleNext());
         document.querySelectorAll('input[name="selection-type"]').forEach(input => {
             input.addEventListener('change', () => {
@@ -49,7 +51,7 @@ export class ImagePartRegistrationProcess {
         });
         // 遷移先画像登録
         this.transitionImageCancelBtn.addEventListener('click', () => this.closeModal(this.transitionImageModal));
-        this.transitionImageRegisterBtn.addEventListener('click', () => this.registerTransitionScreen());
+        this.transitionImageRegisterBtn.addEventListener('click', () => this.registerTransitionImage());
         this.transitionImageInput.addEventListener('input', () => {
             if (this.transitionImageInput.value.trim() !== '') {
                 this.transitionImageRegisterBtn.disabled = false;
@@ -65,15 +67,18 @@ export class ImagePartRegistrationProcess {
             transitionImageRegistered: rect.transitionImageRegistered,
         }
         this.openModal(this.actionSelectionModal)
-        console.log(this.registeredStatus)
+
+        // モーダルが正常に閉じられた場合に this.registeredStatus を返す
+        // APIでエラーになった場合は、reject ではなく、エラーを投げる
         return new Promise((resolve, reject) => {
-            // モーダルが正常に閉じられた場合にresolveを呼び出す
-            this.onModalClose = () => {
-                resolve(this.registeredStatus);
-            };
+            this.onRegistrationSuccess = () => resolve(this.registeredStatus);
+            this.onRegistrationFailure = (error) => reject(error);
         });
     }
 
+    //
+    // モーダル開閉
+    //
     openModal(targetModal) {
         this.modals.forEach(modal => {
             if (modal === targetModal) {
@@ -92,13 +97,31 @@ export class ImagePartRegistrationProcess {
     }
 
     closeAllModals() {
-        this.closeModal(this.actionSelectionModal)
-        this.closeModal(this.partNumberModal)
-        this.closeModal(this.transitionImageModal)
+        this.closeModal(this.partNumberModal);
+        this.closeModal(this.transitionImageModal);
+        this.closeModal(this.actionSelectionModal);
     }
 
     //
-    // アクション選択
+    // 登録成功・失敗後の処理
+    //
+    afterRegistrationSuccess() {
+        this.closeAllModals()
+        if (this.onRegistrationSuccess) this.onRegistrationSuccess()
+    }
+
+    afterRegistrationFailure(err) {
+        this.closeAllModals()
+        if (this.onRegistrationFailure) this.onRegistrationFailure(err)
+    }
+
+    // 登録処理のキャンセル = 成功処理と同じ流れ
+    cancelRegistration() {
+        this.afterRegistrationSuccess()
+    }
+
+    //
+    // アクション選択モーダル
     //
     handleNext() {
         const selectionType= document.querySelector('input[name="selection-type"]:checked').value;
@@ -120,36 +143,36 @@ export class ImagePartRegistrationProcess {
     }
 
     //
-    // 部位番号登録
+    // 部位番号登録モーダル
     //
     registerPartNumber() {
         try {
-            console.log('選択している矩形の相対座標:', this.rect);
-            // TODO: API 叩く
-            this.partNumberInput.value = '';
-            this.closeAllModals()
+            // TODO: this.rect を利用して、部位番号登録 API 叩く
+            console.log('選択している矩形の相対座標:', this.rect)
+            // TODO: Reset Input
+            this.partNumberInput.value = ''
             this.registeredStatus.partNumberRegistered = true
-            if (this.onModalClose) this.onModalClose();
+            this.afterRegistrationSuccess()
         } catch (err) {
-            alert('部位番号の登録失敗')
-            throw err;
+            console.error('部位番号の登録失敗')
+            this.afterRegistrationFailure(err)
         }
     }
 
     //
-    // 遷移先画像登録
+    // 遷移先画像登録モーダル
     //
-    registerTransitionScreen() {
+    registerTransitionImage() {
         try {
-            console.log('選択している矩形の相対座標:', this.rect);
-            // TODO: API 叩く
+            // TODO: this.rect を利用(?)して、遷移先画像登録 API 叩く
+            console.log('選択している矩形の相対座標:', this.rect)
+            // TODO: Reset Input
             this.transitionImageInput.value = ''
-            this.closeAllModals()
             this.registeredStatus.transitionImageRegistered = true
-            if (this.onModalClose) this.onModalClose();
+            this.afterRegistrationSuccess()
         } catch (err) {
-            alert('遷移画面の登録失敗')
-            throw err;
+            console.error('遷移先画像の登録失敗', err)
+            this.afterRegistrationFailure(err)
         }
     }
 }
