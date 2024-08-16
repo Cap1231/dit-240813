@@ -139,6 +139,14 @@ export class ImagePartRegistrationProcess {
     }
 
     //
+    // 入力値のクリア
+    //
+    resetInputFields() {
+        this.partNumberInput.value = ''
+        this.transitionImageInput.value = ''
+    }
+
+    //
     // アクション選択モーダル
     //
     handleNext() {
@@ -167,8 +175,7 @@ export class ImagePartRegistrationProcess {
         try {
             // TODO: this.rect を利用して、部位番号登録 API 叩く
             console.log('選択している矩形の相対座標:', this.rect)
-            // TODO: Reset Input
-            this.partNumberInput.value = ''
+            this.resetInputFields()
             this.registeredStatus.partNumberRegistered = true
             this.afterRegistrationSuccess()
         } catch (err) {
@@ -184,8 +191,7 @@ export class ImagePartRegistrationProcess {
         try {
             // TODO: this.rect を利用(?)して、遷移先画像登録 API 叩く
             console.log('選択している矩形の相対座標:', this.rect)
-            // TODO: Reset Input
-            this.transitionImageInput.value = ''
+            this.resetInputFields()
             this.registeredStatus.transitionImageRegistered = true
             this.afterRegistrationSuccess()
         } catch (err) {
