@@ -2,6 +2,7 @@
 // アクション選択 -> 遷移先画像登録
 export class ImagePartRegistrationProcess {
     constructor() {
+        this.modals = document.querySelectorAll('.modal')
         // アクション選択
         this.actionSelectionModal = document.getElementById('action-selection-modal');
         this.actionSelectionCancelBtn = this.actionSelectionModal.querySelector('.cancel-btn');
@@ -17,7 +18,6 @@ export class ImagePartRegistrationProcess {
         this.transitionImageRegisterBtn = this.transitionImageModal.querySelector('.register-btn');
         this.transitionImageInput = this.transitionImageModal.querySelector('#transition-screen-input');
 
-        this.modals = document.querySelectorAll('.modal');
         this.rect = null; // 選択されている矩形の相対座標
         this.registeredStatus = {
             partNumberRegistered: false,
@@ -35,7 +35,7 @@ export class ImagePartRegistrationProcess {
     //
     setupEventListeners() {
         // アクション選択
-        this.actionSelectionCancelBtn.addEventListener('click', () => this.cancelRegistration());
+        this.actionSelectionCancelBtn.addEventListener('click', () => this.afterRegistrationCancel());
         this.actionSelectionNextBtn.addEventListener('click', () => this.handleNext());
         this.setupSelectionTypeListeners()
         // 部位番号登録
@@ -94,6 +94,15 @@ export class ImagePartRegistrationProcess {
         });
     }
 
+    // 登録ステータスを更新する関数
+    updateRegisteredStatus(type) {
+        if (type === 'partNumber') {
+            this.registeredStatus.partNumberRegistered = true
+        } else if (type === 'transitionImage') {
+            this.registeredStatus.transitionImageRegistered = true
+        }
+    }
+
     //
     // モーダル開閉
     //
@@ -121,21 +130,24 @@ export class ImagePartRegistrationProcess {
     }
 
     //
-    // 登録成功・失敗後の処理
+    // 登録後、途中キャンセルの処理
     //
+    // 登録成功後の処理
     afterRegistrationSuccess() {
+        this.resetInputFields()
         this.closeAllModals()
         if (this.onRegistrationSuccess) this.onRegistrationSuccess()
     }
 
+    // 登録失敗後の処理
     afterRegistrationFailure(err) {
-        this.closeAllModals()
         if (this.onRegistrationFailure) this.onRegistrationFailure(err)
     }
 
-    // 登録処理のキャンセル = 成功処理と同じ流れ
-    cancelRegistration() {
-        this.afterRegistrationSuccess()
+    // 登録キャンセル時の処理
+    afterRegistrationCancel() {
+        this.closeAllModals()
+        if (this.onRegistrationSuccess) this.onRegistrationSuccess()
     }
 
     //
@@ -175,8 +187,7 @@ export class ImagePartRegistrationProcess {
         try {
             // TODO: this.rect を利用して、部位番号登録 API 叩く
             console.log('選択している矩形の相対座標:', this.rect)
-            this.resetInputFields()
-            this.registeredStatus.partNumberRegistered = true
+            this.updateRegisteredStatus('partNumber')
             this.afterRegistrationSuccess()
         } catch (err) {
             console.error('部位番号の登録失敗')
@@ -191,8 +202,7 @@ export class ImagePartRegistrationProcess {
         try {
             // TODO: this.rect を利用(?)して、遷移先画像登録 API 叩く
             console.log('選択している矩形の相対座標:', this.rect)
-            this.resetInputFields()
-            this.registeredStatus.transitionImageRegistered = true
+            this.updateRegisteredStatus('transitionImage')
             this.afterRegistrationSuccess()
         } catch (err) {
             console.error('遷移先画像の登録失敗', err)
