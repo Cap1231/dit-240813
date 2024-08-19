@@ -153,7 +153,8 @@ export class CanvasImageController {
     // 描画した矩形
     //
     // 矩形を探す
-    findRectangleAtPosition(x, y) {
+    findRectangleAtPosition(curPos) {
+        const { x, y } = curPos
         return this.rectangles.find(rect =>
             x >= rect.x && x <= rect.x + rect.width &&
             y >= rect.y && y <= rect.y + rect.height
@@ -324,8 +325,20 @@ export class CanvasImageController {
 
         e.preventDefault()  // デフォルトのコンテキストメニューをキャンセル
 
-        // FIXME: handleLongPressStart から handleRectSelect 呼び出された時に、矩形が見つからない！
-        const selectedRect = this.findRectangleAtPosition(e.offsetX, e.offsetY);
+        let curPos = {}
+        if (e.touches) {
+            const touch = e.touches[0] // 最初のタッチポイントを取得
+            curPos = {
+                x: touch.clientX,
+                y: touch.clientY
+            }
+        } else {
+            curPos = {
+                x: e.offsetX,
+                y: e.offsetY
+            }
+        }
+        const selectedRect = this.findRectangleAtPosition(curPos);
         if (!selectedRect) return;
 
         // ImagePartRegistrationProcess で利用できる形に変換する
@@ -350,7 +363,9 @@ export class CanvasImageController {
     }
 
     handleTouchStart(e) {
+        // ロングタップ
         this.handleLongPressStart(e)
+        // 普通のタップ
         this.handleRectDrawingStart(e)
     }
 
