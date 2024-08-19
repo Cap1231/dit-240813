@@ -26,6 +26,20 @@ export class ImagePartRegistrationProcess {
         this.setupEventListeners();
     }
 
+    // TODO: クラス関数にしてもいいのでは？
+    start(targetRect) {
+        this.rect = targetRect
+        this.openModal(this.actionSelectionModal)
+
+        // 登録成功時、this.rect を返す
+        // 登録失敗時、error を投げる
+        // 登録キャンセル時、this.rect を返す
+        return new Promise((resolve, reject) => {
+            this.onRegistrationSuccess = () => resolve(this.rect);
+            this.onRegistrationFailure = (error) => reject(error);
+        });
+    }
+
     //
     // EventListener
     //
@@ -75,19 +89,6 @@ export class ImagePartRegistrationProcess {
 
     handleModalClose(targetModal) {
         this.closeModal(targetModal)
-    }
-
-    start(targetRect) {
-        this.rect = targetRect
-        this.openModal(this.actionSelectionModal)
-
-        // 登録成功時、this.rect を返す
-        // 登録失敗時、error を投げる
-        // 登録キャンセル時、this.rect を返す
-        return new Promise((resolve, reject) => {
-            this.onRegistrationSuccess = () => resolve(this.rect);
-            this.onRegistrationFailure = (error) => reject(error);
-        });
     }
 
     // 登録ステータスを更新する関数
