@@ -31,20 +31,20 @@ export class ImagePartRegistrationProcess {
     //
     setupEventListeners() {
         // アクション選択
-        this.actionSelectionCancelBtn.addEventListener('click', () => this.afterRegistrationCancel());
+        this.actionSelectionCancelBtn.addEventListener('click', () => this.handleRegistrationCancel());
         this.actionSelectionNextBtn.addEventListener('click', () => this.handleNext());
         this.setupSelectionTypeListeners()
         // 部位番号登録
-        this.partNumberCancelBtn.addEventListener('click', () => this.closeModal(this.partNumberModal));
-        this.partNumberRegisterBtn.addEventListener('click', () => this.registerPartNumber());
+        this.partNumberCancelBtn.addEventListener('click', () => this.handleModalClose(this.partNumberModal));
+        this.partNumberRegisterBtn.addEventListener('click', () => this.handlePartNumberRegister());
         this.partNumberInput.addEventListener('input', () => {
-            this.enableRegisterBtnBasedOnInput(this.partNumberInput, this.partNumberRegisterBtn)
+            this.handleRegisterBtnEnable(this.partNumberInput, this.partNumberRegisterBtn)
         });
         // 遷移先画像登録
-        this.transitionImageCancelBtn.addEventListener('click', () => this.closeModal(this.transitionImageModal));
-        this.transitionImageRegisterBtn.addEventListener('click', () => this.registerTransitionImage());
+        this.transitionImageCancelBtn.addEventListener('click', () => this.handleModalClose(this.transitionImageModal));
+        this.transitionImageRegisterBtn.addEventListener('click', () => this.handleTransitionImageRegister());
         this.transitionImageInput.addEventListener('input', () => {
-            this.enableRegisterBtnBasedOnInput(this.transitionImageInput, this.transitionImageRegisterBtn)
+            this.handleRegisterBtnEnable(this.transitionImageInput, this.transitionImageRegisterBtn)
         });
     }
 
@@ -52,11 +52,11 @@ export class ImagePartRegistrationProcess {
     setupSelectionTypeListeners() {
         const selectionInputs = this.actionSelectionModal.querySelectorAll('input[name="selection-type"]');
         selectionInputs.forEach(input => {
-            input.addEventListener('change', () => this.enableNextButtonOnSelection())
+            input.addEventListener('change', () => this.handleNextBtnEnable())
         })
     }
 
-    enableNextButtonOnSelection() {
+    handleNextBtnEnable() {
         if (document.querySelector('input[name="selection-type"]:checked')) {
             this.actionSelectionNextBtn.disabled = false;
         } else {
@@ -65,12 +65,16 @@ export class ImagePartRegistrationProcess {
     }
 
     // 入力の有無に応じてボタンの有効/無効を切り替える
-    enableRegisterBtnBasedOnInput(inputElement, buttonElement) {
+    handleRegisterBtnEnable(inputElement, buttonElement) {
         if (inputElement.value.trim() !== '') {
             buttonElement.disabled = false;
         } else {
             buttonElement.disabled = true;
         }
+    }
+
+    handleModalClose(targetModal) {
+        this.closeModal(targetModal)
     }
 
     start(targetRect) {
@@ -143,7 +147,7 @@ export class ImagePartRegistrationProcess {
     }
 
     // 登録キャンセル時の処理
-    afterRegistrationCancel() {
+    handleRegistrationCancel() {
         this.resetActionSelectionModal()
         this.closeAllModals()
         if (this.onRegistrationSuccess) this.onRegistrationSuccess()
@@ -193,7 +197,7 @@ export class ImagePartRegistrationProcess {
     //
     // 部位番号登録モーダル
     //
-    registerPartNumber() {
+    handlePartNumberRegister() {
         try {
             // TODO: this.rect を利用して、部位番号登録 API 叩く
             console.log('選択している矩形の相対座標:', this.rect)
@@ -208,7 +212,7 @@ export class ImagePartRegistrationProcess {
     //
     // 遷移先画像登録モーダル
     //
-    registerTransitionImage() {
+    handleTransitionImageRegister() {
         try {
             // TODO: this.rect を利用(?)して、遷移先画像登録 API 叩く
             console.log('選択している矩形の相対座標:', this.rect)
