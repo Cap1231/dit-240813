@@ -236,32 +236,20 @@ export class CanvasImageController {
     // EventListener
     //
     setupEventListeners() {
-        this.canvas.addEventListener('mousedown', e => this.handleStartRectDrawing(e));
-        this.canvas.addEventListener('mousemove', e => this.handleContinueRectDrawing(e));
-        this.canvas.addEventListener('mouseup', e => this.handleEndRectDrawing(e));
-        // 右クリックでモーダルを表示
-        this.canvas.addEventListener('contextmenu', e => this.handleContextMenu(e));
+        this.canvas.addEventListener('mousedown', e => this.handleRectDrawingStart(e));
+        this.canvas.addEventListener('mousemove', e => this.handleRectDrawingContinue(e));
+        this.canvas.addEventListener('mouseup', e => this.handleRectDrawingEnd(e));
+        // 矩形を右クリックで選択
+        this.canvas.addEventListener('contextmenu', e => this.handleRectSelect(e));
 
         // TODO: Refactor
         // タッチイベント
-        this.canvas.addEventListener('touchstart', e => {
-            this.handleLongPressStart(e)
-            this.handleStartRectDrawing(e)
-        });
-        this.canvas.addEventListener('touchmove', e => {
-            clearTimeout(this.longPressTimer)
-            this.handleContinueRectDrawing(e)
-        });
-        this.canvas.addEventListener('touchend', e => {
-            clearTimeout(this.longPressTimer)
-            if (!this.longPressTriggered) {
-                this.handleEndRectDrawing(e);
-            }
-            this.longPressTriggered = false;
-        });
+        this.canvas.addEventListener('touchstart', e => this.handleTouchStart(e));
+        this.canvas.addEventListener('touchmove', e => this.handleTouchMove(e));
+        this.canvas.addEventListener('touchend', e => this.handleTouchEnd(e));
     }
 
-    handleStartRectDrawing(e) {
+    handleRectDrawingStart(e) {
         let curPos = {}
         if (e.touches) {
             e.preventDefault() // スクロールやズームを防ぐ
@@ -280,7 +268,7 @@ export class CanvasImageController {
         this.setDraggingState(curPos)
     }
 
-    handleContinueRectDrawing(e) {
+    handleRectDrawingContinue(e) {
         if (!this.isDragging) return;
 
         this.updateCanvas()
@@ -303,7 +291,7 @@ export class CanvasImageController {
         this.drawCurrentRectangle()
     }
 
-    handleEndRectDrawing(e) {
+    handleRectDrawingEnd(e) {
         if (!this.isDragging || !this.currentRect) return;
 
         // 高さと幅が無い矩形は登録しない
@@ -331,12 +319,12 @@ export class CanvasImageController {
 
     // onRectSelected をセットしていない場合、デフォルトのコンテキストメニューを表示し、
     // セットされている場合は、右クリックした場所にある矩形情報を取得し、onRectSelectedを呼び出す
-    async handleContextMenu(e) {
+    async handleRectSelect(e) {
         if (!this.onRectSelected) return;
 
         e.preventDefault()  // デフォルトのコンテキストメニューをキャンセル
 
-        // FIXME: handleLongPressStart から handleContextMenu 呼び出された時に、矩形が見つからない！
+        // FIXME: handleLongPressStart から handleRectSelect 呼び出された時に、矩形が見つからない！
         const selectedRect = this.findRectangleAtPosition(e.offsetX, e.offsetY);
         if (!selectedRect) return;
 
@@ -357,7 +345,25 @@ export class CanvasImageController {
         this.longPressTriggered = false;
         this.longPressTimer = setTimeout(async () => {
             this.longPressTriggered = true;
-            await this.handleContextMenu(e)
+            await this.handleRectSelect(e)
         }, 500);  // 500msがロングタップとして扱う
+    }
+
+    handleTouchStart(e) {
+        this.handleLongPressStart(e)
+        this.handleRectDrawingStart(e)
+    }
+
+    handleTouchMove(e) {
+        clearTimeout(this.longPressTimer)
+        this.handleRectDrawingContinue(e)
+    }
+
+    handleTouchEnd(e) {
+        clearTimeout(this.longPressTimer)
+        if (!this.longPressTriggered) {
+            this.handleRectDrawingEnd(e);
+        }
+        this.longPressTriggered = false;
     }
 }
