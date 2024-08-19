@@ -18,6 +18,23 @@ export class CanvasImageController {
         this.setupEventListeners();
     }
 
+    //
+    // EventListener
+    //
+    setupEventListeners() {
+        this.canvas.addEventListener('mousedown', e => this.handleRectDrawingStart(e));
+        this.canvas.addEventListener('mousemove', e => this.handleRectDrawingContinue(e));
+        this.canvas.addEventListener('mouseup', e => this.handleRectDrawingEnd(e));
+        // 矩形を右クリックで選択
+        this.canvas.addEventListener('contextmenu', e => this.handleRectSelect(e));
+
+        // TODO: Refactor
+        // タッチイベント
+        this.canvas.addEventListener('touchstart', e => this.handleTouchStart(e));
+        this.canvas.addEventListener('touchmove', e => this.handleTouchMove(e));
+        this.canvas.addEventListener('touchend', e => this.handleTouchEnd(e));
+    }
+
     setupImage(imageUrl) {
         this.img.src = imageUrl;
         this.img.onload = () => {
@@ -230,23 +247,6 @@ export class CanvasImageController {
         if (message) alert(message);
         this.updateCanvas()
         this.resetDraggingState()
-    }
-
-    //
-    // EventListener
-    //
-    setupEventListeners() {
-        this.canvas.addEventListener('mousedown', e => this.handleRectDrawingStart(e));
-        this.canvas.addEventListener('mousemove', e => this.handleRectDrawingContinue(e));
-        this.canvas.addEventListener('mouseup', e => this.handleRectDrawingEnd(e));
-        // 矩形を右クリックで選択
-        this.canvas.addEventListener('contextmenu', e => this.handleRectSelect(e));
-
-        // TODO: Refactor
-        // タッチイベント
-        this.canvas.addEventListener('touchstart', e => this.handleTouchStart(e));
-        this.canvas.addEventListener('touchmove', e => this.handleTouchMove(e));
-        this.canvas.addEventListener('touchend', e => this.handleTouchEnd(e));
     }
 
     handleRectDrawingStart(e) {
