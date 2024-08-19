@@ -96,25 +96,25 @@ export class CanvasImageController {
     // y: ドラッグ開始点と現在点のうち、小さい方を y 座標とする
     // width : 始点と現在点の差の絶対値の高さ
     // height: 始点と現在点の差の絶対値の幅
-    calcCurrentRectangle(e) {
+    calcCurrentRectangle(curPos) {
         this.currentRect = {
             ...this.currentRect,
-            x: Math.min(this.startPos.x, e.offsetX),
-            y: Math.min(this.startPos.y, e.offsetY),
-            width: Math.abs(e.offsetX - this.startPos.x),
-            height: Math.abs(e.offsetY - this.startPos.y)
+            x: Math.min(this.startPos.x, curPos.x),
+            y: Math.min(this.startPos.y, curPos.y),
+            width: Math.abs(curPos.x - this.startPos.x),
+            height: Math.abs(curPos.y - this.startPos.y)
         }
     }
 
     // ドラッグ開始時に管理するステートをセット
-    setDraggingState(e) {
+    setDraggingState(curPos) {
         this.startPos = {
-            x: e.offsetX,
-            y: e.offsetY
+            x: curPos.x,
+            y: curPos.y
         };
         this.currentRect = {
-            x: e.offsetX,
-            y: e.offsetY,
+            x: curPos.x,
+            y: curPos.y,
             width: 0,
             height: 0,
             partNumberRegistered: false,
@@ -234,27 +234,58 @@ export class CanvasImageController {
     // EventListener
     //
     setupEventListeners() {
-        this.canvas.addEventListener('mousedown', e => {
-            if (e.button === 2) return false; // 右クリックの場合は何もしない
-            this.handleMouseDown(e)
-        });
+        this.canvas.addEventListener('mousedown', e => this.handleMouseDown(e));
         this.canvas.addEventListener('mousemove', e => this.handleMouseMove(e));
         this.canvas.addEventListener('mouseup', e => this.handleMouseUp(e));
         // 右クリックでモーダルを表示
         this.canvas.addEventListener('contextmenu', e => this.handleContextMenu(e));
+
+        // タッチイベント
+        this.canvas.addEventListener('touchstart', e => this.handleMouseDown(e));
+        this.canvas.addEventListener('touchmove', e => this.handleMouseMove(e));
+        this.canvas.addEventListener('touchend', e => this.handleContextMenu(e));
     }
 
     handleMouseDown(e) {
-        this.setDraggingState(e)
+        let curPos = {}
+        if (e.touches) {
+            e.preventDefault() // スクロールなどのデフォルトの動作を防ぐ
+            const touch = e.touches[0] // 最初のタッチポイントを取得
+            curPos = {
+                x: touch.clientX,
+                y: touch.clientY
+            }
+        } else {
+            if (e.button !== 0) return // 左クリック以外は無視
+            curPos = {
+                x: e.offsetX,
+                y: e.offsetY
+            }
+        }
+        this.setDraggingState(curPos)
     }
 
     handleMouseMove(e) {
         if (!this.isDragging) return;
 
         this.updateCanvas()
+
+        let curPos = {}
+        if (e.touches) {
+            // TODO: 要チェック
+            curPos = {
+                x: e.touches[0].clientX - this.canvas.getBoundingClientRect().left,
+                y: e.touches[0].clientY - this.canvas.getBoundingClientRect().top
+            }
+        } else {
+            curPos = {
+                x: e.offsetX,
+                y: e.offsetY
+            }
+        }
         // 現在ドラッグしている矩形を描画
-        this.calcCurrentRectangle(e)
-        this.drawCurrentRectangle();
+        this.calcCurrentRectangle(curPos)
+        this.drawCurrentRectangle()
     }
 
     handleMouseUp(e) {
