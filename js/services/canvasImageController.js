@@ -11,6 +11,8 @@ export class CanvasImageController {
         this.startPos = null; // ドラッグ開始点の絶対座標
         this.isDragging = false;
         this.onRectSelected = null; // 矩形を右クリック押下時に呼び出すコールバック(外部から設定)
+        this.longPressTimer = null; // ロングプレスタイマーのIDを保持
+        this.longPressTriggered = false; // ロングプレスがトリガーされたかどうか
 
         this.setupImage(imageUrl);
         this.setupEventListeners();
@@ -240,16 +242,29 @@ export class CanvasImageController {
         // 右クリックでモーダルを表示
         this.canvas.addEventListener('contextmenu', e => this.handleContextMenu(e));
 
+        // TODO: Refactor
         // タッチイベント
-        this.canvas.addEventListener('touchstart', e => this.handleStartRectDrawing(e));
-        this.canvas.addEventListener('touchmove', e => this.handleContinueRectDrawing(e));
-        this.canvas.addEventListener('touchend', e => this.handleEndRectDrawing(e));
+        this.canvas.addEventListener('touchstart', e => {
+            this.handleLongPressStart(e)
+            this.handleStartRectDrawing(e)
+        });
+        this.canvas.addEventListener('touchmove', e => {
+            clearTimeout(this.longPressTimer)
+            this.handleContinueRectDrawing(e)
+        });
+        this.canvas.addEventListener('touchend', e => {
+            clearTimeout(this.longPressTimer)
+            if (!this.longPressTriggered) {
+                this.handleEndRectDrawing(e);
+            }
+            this.longPressTriggered = false;
+        });
     }
 
     handleStartRectDrawing(e) {
         let curPos = {}
         if (e.touches) {
-            e.preventDefault() // スクロールなどのデフォルトの動作を防ぐ
+            e.preventDefault() // スクロールやズームを防ぐ
             const touch = e.touches[0] // 最初のタッチポイントを取得
             curPos = {
                 x: touch.clientX,
@@ -321,6 +336,7 @@ export class CanvasImageController {
 
         e.preventDefault()  // デフォルトのコンテキストメニューをキャンセル
 
+        // FIXME: handleLongPressStart から handleContextMenu 呼び出された時に、矩形が見つからない！
         const selectedRect = this.findRectangleAtPosition(e.offsetX, e.offsetY);
         if (!selectedRect) return;
 
@@ -335,5 +351,13 @@ export class CanvasImageController {
         } catch (err) {
             console.error('部位番号 or 遷移先画像の登録失敗', err);
         }
+    }
+
+    handleLongPressStart(e) {
+        this.longPressTriggered = false;
+        this.longPressTimer = setTimeout(async () => {
+            this.longPressTriggered = true;
+            await this.handleContextMenu(e)
+        }, 500);  // 500msがロングタップとして扱う
     }
 }
