@@ -236,14 +236,14 @@ export class CanvasImageController {
     setupEventListeners() {
         this.canvas.addEventListener('mousedown', e => this.handleStartRectDrawing(e));
         this.canvas.addEventListener('mousemove', e => this.handleContinueRectDrawing(e));
-        this.canvas.addEventListener('mouseup', e => this.handleFinishRectDrawing(e));
+        this.canvas.addEventListener('mouseup', e => this.handleEndRectDrawing(e));
         // 右クリックでモーダルを表示
         this.canvas.addEventListener('contextmenu', e => this.handleContextMenu(e));
 
         // タッチイベント
         this.canvas.addEventListener('touchstart', e => this.handleStartRectDrawing(e));
         this.canvas.addEventListener('touchmove', e => this.handleContinueRectDrawing(e));
-        this.canvas.addEventListener('touchend', e => this.handleFinishRectDrawing(e));
+        this.canvas.addEventListener('touchend', e => this.handleEndRectDrawing(e));
     }
 
     handleStartRectDrawing(e) {
@@ -288,7 +288,7 @@ export class CanvasImageController {
         this.drawCurrentRectangle()
     }
 
-    handleFinishRectDrawing(e) {
+    handleEndRectDrawing(e) {
         if (!this.isDragging || !this.currentRect) return;
 
         // 高さと幅が無い矩形は登録しない
