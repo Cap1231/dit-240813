@@ -234,19 +234,19 @@ export class CanvasImageController {
     // EventListener
     //
     setupEventListeners() {
-        this.canvas.addEventListener('mousedown', e => this.handleMouseDown(e));
-        this.canvas.addEventListener('mousemove', e => this.handleMouseMove(e));
-        this.canvas.addEventListener('mouseup', e => this.handleMouseUp(e));
+        this.canvas.addEventListener('mousedown', e => this.handleStartRectDrawing(e));
+        this.canvas.addEventListener('mousemove', e => this.handleContinueRectDrawing(e));
+        this.canvas.addEventListener('mouseup', e => this.handleFinishRectDrawing(e));
         // 右クリックでモーダルを表示
         this.canvas.addEventListener('contextmenu', e => this.handleContextMenu(e));
 
         // タッチイベント
-        this.canvas.addEventListener('touchstart', e => this.handleMouseDown(e));
-        this.canvas.addEventListener('touchmove', e => this.handleMouseMove(e));
-        this.canvas.addEventListener('touchend', e => this.handleContextMenu(e));
+        this.canvas.addEventListener('touchstart', e => this.handleStartRectDrawing(e));
+        this.canvas.addEventListener('touchmove', e => this.handleContinueRectDrawing(e));
+        this.canvas.addEventListener('touchend', e => this.handleFinishRectDrawing(e));
     }
 
-    handleMouseDown(e) {
+    handleStartRectDrawing(e) {
         let curPos = {}
         if (e.touches) {
             e.preventDefault() // スクロールなどのデフォルトの動作を防ぐ
@@ -265,7 +265,7 @@ export class CanvasImageController {
         this.setDraggingState(curPos)
     }
 
-    handleMouseMove(e) {
+    handleContinueRectDrawing(e) {
         if (!this.isDragging) return;
 
         this.updateCanvas()
@@ -288,7 +288,7 @@ export class CanvasImageController {
         this.drawCurrentRectangle()
     }
 
-    handleMouseUp(e) {
+    handleFinishRectDrawing(e) {
         if (!this.isDragging || !this.currentRect) return;
 
         // 高さと幅が無い矩形は登録しない
