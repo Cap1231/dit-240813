@@ -22,9 +22,9 @@ export class CanvasImageController {
     // EventListener
     //
     setupEventListeners() {
-        this.canvas.addEventListener('mousedown', e => this.handleRectDrawingStart(e));
-        this.canvas.addEventListener('mousemove', e => this.handleRectDrawingContinue(e));
-        this.canvas.addEventListener('mouseup', e => this.handleRectDrawingEnd(e));
+        this.canvas.addEventListener('mousedown', e => this.handleMouseDown(e));
+        this.canvas.addEventListener('mousemove', e => this.handleMouseMove(e));
+        this.canvas.addEventListener('mouseup', e => this.handleMouseUp(e));
         // 矩形を右クリックで選択
         this.canvas.addEventListener('contextmenu', e => this.handleRectRightClick(e));
 
@@ -250,49 +250,47 @@ export class CanvasImageController {
         this.resetDraggingState()
     }
 
-    handleRectDrawingStart(e) {
-        let curPos = {}
-        if (e.touches) {
-            e.preventDefault() // スクロールやズームを防ぐ
-            const touch = e.touches[0] // 最初のタッチポイントを取得
-            curPos = {
-                x: touch.clientX,
-                y: touch.clientY
-            }
-        } else {
-            if (e.button !== 0) return // 左クリック以外は無視
-            curPos = {
-                x: e.offsetX,
-                y: e.offsetY
-            }
+
+    //
+    // MouseEvent
+    //
+    handleMouseDown(e) {
+        if (e.button !== 0) return // 左クリック以外は無視
+        const curPos = {
+            x: e.offsetX,
+            y: e.offsetY
         }
+        this.handleRectDrawingStart(curPos)
+    }
+
+    handleMouseMove(e) {
+        const curPos = {
+            x: e.offsetX,
+            y: e.offsetY
+        }
+        this.handleRectDrawingContinue(curPos)
+    }
+
+    handleMouseUp(e) {
+        this.handleRectDrawingEnd()
+    }
+
+
+    handleRectDrawingStart(curPos) {
         this.setDraggingState(curPos)
     }
 
-    handleRectDrawingContinue(e) {
+    handleRectDrawingContinue(curPos) {
         if (!this.isDragging) return;
 
         this.updateCanvas()
 
-        let curPos = {}
-        if (e.touches) {
-            // TODO: 要チェック
-            curPos = {
-                x: e.touches[0].clientX - this.canvas.getBoundingClientRect().left,
-                y: e.touches[0].clientY - this.canvas.getBoundingClientRect().top
-            }
-        } else {
-            curPos = {
-                x: e.offsetX,
-                y: e.offsetY
-            }
-        }
         // 現在ドラッグしている矩形を描画
         this.calcCurrentRectangle(curPos)
         this.drawCurrentRectangle()
     }
 
-    handleRectDrawingEnd(e) {
+    handleRectDrawingEnd() {
         if (!this.isDragging || !this.currentRect) return;
 
         // 高さと幅が無い矩形は登録しない
@@ -350,6 +348,13 @@ export class CanvasImageController {
         }
     }
 
+    handleTouchStart(e) {
+        // 長押し
+        this.handleLongPressStart(e)
+        // 普通のタッチ
+        this.handleTouchDrawStart(e)
+    }
+
     handleLongPressStart(e) {
         this.longPressTriggered = false;
         this.longPressTimer = setTimeout(async () => {
@@ -364,22 +369,31 @@ export class CanvasImageController {
         }, 500);  // 500msがロングタップとして扱う
     }
 
-    handleTouchStart(e) {
-        // ロングタップ
-        this.handleLongPressStart(e)
-        // 普通のタップ
-        this.handleRectDrawingStart(e)
+    handleTouchDrawStart(e) {
+        e.preventDefault() // スクロールやズームを防ぐ
+        // TODO: 共通化
+        const touch = e.touches[0] // 最初のタッチポイントを取得
+        const curPos = {
+            x: touch.clientX,
+            y: touch.clientY
+        }
+        this.handleRectDrawingStart(curPos)
     }
 
     handleTouchMove(e) {
         clearTimeout(this.longPressTimer)
-        this.handleRectDrawingContinue(e)
+        // TODO: 関数切り出し ＆ ロジック要チェック
+        const curPos = {
+            x: e.touches[0].clientX - this.canvas.getBoundingClientRect().left,
+            y: e.touches[0].clientY - this.canvas.getBoundingClientRect().top
+        }
+        this.handleRectDrawingContinue(curPos)
     }
 
     handleTouchEnd(e) {
         clearTimeout(this.longPressTimer)
         if (!this.longPressTriggered) {
-            this.handleRectDrawingEnd(e);
+            this.handleRectDrawingEnd();
         }
         this.longPressTriggered = false;
     }
