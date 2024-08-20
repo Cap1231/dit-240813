@@ -113,7 +113,7 @@ export class CanvasImageController {
     updateCanvas() {
         this.clearCanvas()
         this.drawImage()
-        this.drawRectangles()
+        this.drawRects()
     }
 
     //
@@ -142,30 +142,30 @@ export class CanvasImageController {
     // Canvas内の矩形
     //
     // 現在ドラッグ(タッチ)している矩形 currentRect を描画
-    drawCurrentRectangle() {
-        this.drawRectangle(this.currentRect)
+    drawCurrentRect() {
+        this.drawRect(this.currentRect)
     }
 
     // 全ての矩形 rects を描画
-    drawRectangles() {
-        this.rects.forEach(rect => this.drawRectangle(rect))
+    drawRects() {
+        this.rects.forEach(rect => this.drawRect(rect))
     }
 
     // 引数で渡された矩形を描画
     // partNumber と　transitionImage が登録済みの矩形は、緑色になる。それ以外は、赤色
-    drawRectangle(rect) {
+    drawRect(rect) {
         const allRegistered = rect.partNumberRegistered && rect.transitionImageRegistered
         this.ctx.strokeStyle = allRegistered ? COLORS.registered : COLORS.inProgress
         this.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height)
     }
 
     // ドラッグ(タッチ)した矩形を rects に追加
-    addCurrentRectangle() {
+    addCurrentRect() {
         this.rects.push(this.currentRect)
     }
 
     // ドラッグ(タッチ)している矩形 currentRect を更新
-    updateCurrentRectangle(curPos) {
+    updateCurrentRect(curPos) {
         this.currentRect = {
             ...this.currentRect,
             ...this.calcCurrentRectPos(curPos),
@@ -173,7 +173,7 @@ export class CanvasImageController {
     }
 
     // rects から curPos を含む矩形を探す
-    findRectangleAtPosition(curPos) {
+    findRectAtPosition(curPos) {
         const {x, y} = curPos
         return this.rects.find(rect =>
             x >= rect.x && x <= rect.x + rect.width &&
@@ -182,7 +182,7 @@ export class CanvasImageController {
     }
 
     // 指定した矩形を processedRect で更新 or 指定した矩形を rects から削除
-    updateOrDeleteTargetRectangle(targetRect, processedRect) {
+    updateOrDeleteTargetRect(targetRect, processedRect) {
         if (processedRect.deleted === true) {
             this.deleteTargetRect(targetRect)
         } else {
@@ -288,10 +288,10 @@ export class CanvasImageController {
     //
     // ドラッグした矩形が既存のいずれかの矩形と重複していないか確認
     checkOverlap() {
-        return this.rects.some(rect => this.checkRectanglesOverlap(rect, this.currentRect))
+        return this.rects.some(rect => this.checkRectsOverlap(rect, this.currentRect))
     }
 
-    checkRectanglesOverlap(rect1, rect2) {
+    checkRectsOverlap(rect1, rect2) {
         return !(rect2.x > rect1.x + rect1.width ||
             rect2.x + rect2.width < rect1.x ||
             rect2.y > rect1.y + rect1.height ||
@@ -326,8 +326,8 @@ export class CanvasImageController {
         this.updateCanvas()
 
         // 現在ドラッグしている矩形を描画
-        this.updateCurrentRectangle(curPos)
-        this.drawCurrentRectangle()
+        this.updateCurrentRect(curPos)
+        this.drawCurrentRect()
     }
 
     finalizeRectDraw() {
@@ -352,7 +352,7 @@ export class CanvasImageController {
             return
         }
 
-        this.addCurrentRectangle()
+        this.addCurrentRect()
         this.updateCanvas()
         this.resetRectDrawState()
     }
@@ -362,7 +362,7 @@ export class CanvasImageController {
     async processSelectedRect(curPos) {
         if (!this.onRectSelected) return
 
-        const selectedRect = this.findRectangleAtPosition(curPos)
+        const selectedRect = this.findRectAtPosition(curPos)
         if (!selectedRect) return
 
         // ImagePartRegistrationProcess で利用できる形に変換する
@@ -370,7 +370,7 @@ export class CanvasImageController {
 
         try {
             const processedRect = await this.onRectSelected(formattedRect)
-            this.updateOrDeleteTargetRectangle(selectedRect, processedRect)
+            this.updateOrDeleteTargetRect(selectedRect, processedRect)
             this.updateCanvas()
             console.log('登録後の矩形情報一覧', this.rects)
         } catch (err) {
