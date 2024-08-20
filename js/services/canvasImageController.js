@@ -9,7 +9,7 @@ export class CanvasImageController {
         this.rects = [] // 描画した矩形全ての絶対座標
         this.currentRect = null // 描画中の矩形の絶対座標
         this.startPos = null // ドラッグ開始点の絶対座標
-        this.isDragging = false
+        this.isDrawing = false
         this.onRectSelected = null // 矩形を右クリック押下時に呼び出すコールバック(外部から設定)
         this.longPressTimer = null // ロングプレスタイマーのIDを保持
         this.longPressTriggered = false // ロングプレスがトリガーされたかどうか
@@ -52,11 +52,11 @@ export class CanvasImageController {
 
     handleMouseMove(e) {
         const curPos = this.getCurrentMousePos(e)
-        this.handleRectDrawingContinue(curPos)
+        this.updateRectDraw(curPos)
     }
 
     handleMouseUp(e) {
-        this.handleRectDrawingEnd()
+        this.finalizeRectDraw()
     }
 
     // 右クリック
@@ -64,7 +64,7 @@ export class CanvasImageController {
         e.preventDefault()  // デフォルトのコンテキストメニューをキャンセル
 
         const curPos = this.getCurrentMousePos(e)
-        await this.handleRectSelect(curPos)
+        await this.processSelectedRect(curPos)
     }
 
     //
@@ -73,15 +73,18 @@ export class CanvasImageController {
     // PC の右クリックの代わりは、長押し
     handleTouchStart(e) {
         // 長押し
-        this.handleLongPressStart(e)
+        this.setLongPressDetection(e)
+
         // 普通のタッチ
-        this.handleTouchDrawStart(e)
+        e.preventDefault() // スクロールやズームを防ぐ
+        const curPos = this.getCurrentTouchPos(e)
+        this.setRectDrawState(curPos)
     }
 
     handleTouchMove(e) {
         clearTimeout(this.longPressTimer)
         const curPos = this.getCurrentTouchPos(e)
-        this.handleRectDrawingContinue(curPos)
+        this.updateRectDraw(curPos)
     }
 
     handleTouchEnd(e) {
@@ -89,7 +92,7 @@ export class CanvasImageController {
         if (this.longPressTriggered) {
             this.longPressTriggered = false
         } else {
-            this.handleRectDrawingEnd()
+            this.finalizeRectDraw()
         }
     }
 
@@ -243,14 +246,14 @@ export class CanvasImageController {
             partNumberRegistered: false,
             transitionImageRegistered: false
         }
-        this.isDragging = true
+        this.isDrawing = true
     }
 
     // 矩形描画終了時にステートをリセット
     resetRectDrawState() {
         this.startPos = null
         this.currentRect = null
-        this.isDragging = false
+        this.isDrawing = false
     }
 
     // ImagePartRegistrationProcess で利用できる形に変換する
@@ -305,33 +308,47 @@ export class CanvasImageController {
     }
 
     //
-    // ErrorHandler
+    // Event Handler の中身
     //
-    handleRectangleCreationError(message) {
-        if (message) alert(message)
-        this.updateCanvas()
-        this.resetRectDrawState()
+    // 500ms をロングタップとして扱う
+    setLongPressDetection(e) {
+        this.longPressTriggered = false
+        this.longPressTimer = setTimeout(async () => {
+            this.longPressTriggered = true
+            const curPos = this.getCurrentTouchPos(e)
+            await this.processSelectedRect(curPos)
+        }, 500)
     }
 
-    handleRectDrawingEnd() {
-        if (!this.isDragging || !this.currentRect) return
+    updateRectDraw(curPos) {
+        if (!this.isDrawing) return
+
+        this.updateCanvas()
+
+        // 現在ドラッグしている矩形を描画
+        this.updateCurrentRectangle(curPos)
+        this.drawCurrentRectangle()
+    }
+
+    finalizeRectDraw() {
+        if (!this.isDrawing || !this.currentRect) return
 
         // 高さと幅が無い矩形は登録しない
         if (this.currentRect.width === 0 || this.currentRect.height === 0) {
-            this.handleRectangleCreationError(null)
+            this.processRectDrawError(null)
             return
         }
 
 
         // 矩形が画像内にあるかチェック
         if (!this.checkWithinImage()) {
-            this.handleRectangleCreationError('画像の範囲外を選択しています！')
+            this.processRectDrawError('画像の範囲外を選択しています！')
             return
         }
 
         // 矩形の重複チェック
         if (this.checkOverlap()) {
-            this.handleRectangleCreationError('描画範囲が重複しています！')
+            this.processRectDrawError('描画範囲が重複しています！')
             return
         }
 
@@ -342,7 +359,7 @@ export class CanvasImageController {
 
     // onRectSelected をセットしていない場合、デフォルトのコンテキストメニューを表示し、
     // セットされている場合は、右クリックした場所にある矩形情報を取得し、onRectSelectedを呼び出す
-    async handleRectSelect(curPos) {
+    async processSelectedRect(curPos) {
         if (!this.onRectSelected) return
 
         const selectedRect = this.findRectangleAtPosition(curPos)
@@ -361,29 +378,10 @@ export class CanvasImageController {
         }
     }
 
-    // 500ms をロングタップとして扱う
-    handleLongPressStart(e) {
-        this.longPressTriggered = false
-        this.longPressTimer = setTimeout(async () => {
-            this.longPressTriggered = true
-            const curPos = this.getCurrentTouchPos(e)
-            await this.handleRectSelect(curPos)
-        }, 500)
-    }
-
-    handleTouchDrawStart(e) {
-        e.preventDefault() // スクロールやズームを防ぐ
-        const curPos = this.getCurrentTouchPos(e)
-        this.setRectDrawState(curPos)
-    }
-
-    handleRectDrawingContinue(curPos) {
-        if (!this.isDragging) return
-
+    // 矩形描画に失敗した時の後処理
+    processRectDrawError(message) {
+        if (message) alert(message)
         this.updateCanvas()
-
-        // 現在ドラッグしている矩形を描画
-        this.updateCurrentRectangle(curPos)
-        this.drawCurrentRectangle()
+        this.resetRectDrawState()
     }
 }
