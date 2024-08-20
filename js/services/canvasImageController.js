@@ -1,105 +1,105 @@
-import { COLORS } from "../constants";
+import {COLORS} from "../constants"
 
 export class CanvasImageController {
     constructor(canvasId, imageUrl) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.img =  new Image();
-        this.imgPos = null; // Canvas内で表示している画像の絶対座標
-        this.rectangles = []; // 描画した矩形たちの絶対座標
-        this.currentRect = null; // 現在ドラッグしている矩形の絶対座標
-        this.startPos = null; // ドラッグ開始点の絶対座標
-        this.isDragging = false;
-        this.onRectSelected = null; // 矩形を右クリック押下時に呼び出すコールバック(外部から設定)
-        this.longPressTimer = null; // ロングプレスタイマーのIDを保持
-        this.longPressTriggered = false; // ロングプレスがトリガーされたかどうか
+        this.canvas = document.getElementById(canvasId)
+        this.ctx = this.canvas.getContext('2d')
+        this.img = new Image()
+        this.imgPos = null // Canvas内で表示している画像の絶対座標
+        this.rectangles = [] // 描画した矩形たちの絶対座標
+        this.currentRect = null // 現在ドラッグしている矩形の絶対座標
+        this.startPos = null // ドラッグ開始点の絶対座標
+        this.isDragging = false
+        this.onRectSelected = null // 矩形を右クリック押下時に呼び出すコールバック(外部から設定)
+        this.longPressTimer = null // ロングプレスタイマーのIDを保持
+        this.longPressTriggered = false // ロングプレスがトリガーされたかどうか
 
-        this.setupImage(imageUrl);
-        this.setupEventListeners();
+        this.setupImage(imageUrl)
+        this.setupEventListeners()
     }
 
     //
     // EventListener
     //
     setupEventListeners() {
-        this.canvas.addEventListener('mousedown', e => this.handleMouseDown(e));
-        this.canvas.addEventListener('mousemove', e => this.handleMouseMove(e));
-        this.canvas.addEventListener('mouseup', e => this.handleMouseUp(e));
+        this.canvas.addEventListener('mousedown', e => this.handleMouseDown(e))
+        this.canvas.addEventListener('mousemove', e => this.handleMouseMove(e))
+        this.canvas.addEventListener('mouseup', e => this.handleMouseUp(e))
         // 矩形を右クリックで選択
-        this.canvas.addEventListener('contextmenu', e => this.handleRectRightClick(e));
+        this.canvas.addEventListener('contextmenu', e => this.handleRectRightClick(e))
 
         // TODO: Refactor
         // タッチイベント
-        this.canvas.addEventListener('touchstart', e => this.handleTouchStart(e));
-        this.canvas.addEventListener('touchmove', e => this.handleTouchMove(e));
-        this.canvas.addEventListener('touchend', e => this.handleTouchEnd(e));
+        this.canvas.addEventListener('touchstart', e => this.handleTouchStart(e))
+        this.canvas.addEventListener('touchmove', e => this.handleTouchMove(e))
+        this.canvas.addEventListener('touchend', e => this.handleTouchEnd(e))
     }
 
     setupImage(imageUrl) {
-        this.img.src = imageUrl;
+        this.img.src = imageUrl
         this.img.onload = () => {
-            this.resizeCanvas();
-            this.imgPos = this.getImagePositionOnCanvas();
-            this.drawImage();
-        };
+            this.resizeCanvas()
+            this.imgPos = this.getImagePositionOnCanvas()
+            this.drawImage()
+        }
     }
 
     resizeCanvas() {
         // NOTE: 仮で適当にセットしてます
-        this.canvas.width = window.innerWidth * 0.8;
-        this.canvas.height = window.innerHeight * 0.8;
+        this.canvas.width = window.innerWidth * 0.8
+        this.canvas.height = window.innerHeight * 0.8
     }
 
     clearCanvas() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
     }
 
     // 全ての矩形を描画して、Canvasを最新にする
     updateCanvas() {
-        this.clearCanvas();
-        this.drawImage();
-        this.drawRectangles();
+        this.clearCanvas()
+        this.drawImage()
+        this.drawRectangles()
     }
 
     getImagePositionOnCanvas() {
-        const canvasWidth = this.canvas.width;
-        const canvasHeight = this.canvas.height;
-        const ratio = Math.min(canvasWidth / this.img.width, canvasHeight / this.img.height);
-        const newWidth = Math.round(this.img.width * ratio);
-        const newHeight = Math.round(this.img.height * ratio);
+        const canvasWidth = this.canvas.width
+        const canvasHeight = this.canvas.height
+        const ratio = Math.min(canvasWidth / this.img.width, canvasHeight / this.img.height)
+        const newWidth = Math.round(this.img.width * ratio)
+        const newHeight = Math.round(this.img.height * ratio)
         return {
             x: Math.round((canvasWidth - newWidth) / 2),
             y: Math.round((canvasHeight - newHeight) / 2),
             width: newWidth,
             height: newHeight
-        };
+        }
     }
 
     //
     // Canvas内の画像描画
     //
     drawImage() {
-        const { x, y, width, height } = this.imgPos;
-        this.ctx.drawImage(this.img, x, y, width, height);
+        const {x, y, width, height} = this.imgPos
+        this.ctx.drawImage(this.img, x, y, width, height)
     }
 
     //
     // Canvas内の矩形描画
     //
     drawRectangle(rect) {
-        const allRegistered = rect.partNumberRegistered && rect.transitionImageRegistered;
-        this.ctx.strokeStyle = allRegistered ? COLORS.registered : COLORS.inProgress;
-        this.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+        const allRegistered = rect.partNumberRegistered && rect.transitionImageRegistered
+        this.ctx.strokeStyle = allRegistered ? COLORS.registered : COLORS.inProgress
+        this.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height)
     }
 
     // 現在ドラッグしている矩形を描画
     drawCurrentRectangle() {
-        this.drawRectangle(this.currentRect);
+        this.drawRectangle(this.currentRect)
     }
 
     // 全ての矩形を描画
     drawRectangles() {
-        this.rectangles.forEach(rect => this.drawRectangle(rect));
+        this.rectangles.forEach(rect => this.drawRectangle(rect))
     }
 
     //
@@ -107,7 +107,7 @@ export class CanvasImageController {
     //
     // ドラッグした矩形を rectangles に追加
     addCurrentRectangle() {
-        this.rectangles.push(this.currentRect);
+        this.rectangles.push(this.currentRect)
     }
 
     // 現在ドラッグしている矩形情報を計算する
@@ -130,7 +130,7 @@ export class CanvasImageController {
         this.startPos = {
             x: curPos.x,
             y: curPos.y
-        };
+        }
         this.currentRect = {
             x: curPos.x,
             y: curPos.y,
@@ -139,14 +139,14 @@ export class CanvasImageController {
             partNumberRegistered: false,
             transitionImageRegistered: false
         }
-        this.isDragging = true;
+        this.isDragging = true
     }
 
     // ドラッグ終了時に管理していたステートをリセット
     resetDraggingState() {
-        this.startPos = null;
-        this.currentRect = null;
-        this.isDragging = false;
+        this.startPos = null
+        this.currentRect = null
+        this.isDragging = false
     }
 
     //
@@ -154,17 +154,17 @@ export class CanvasImageController {
     //
     // 矩形を探す
     findRectangleAtPosition(curPos) {
-        const { x, y } = curPos
+        const {x, y} = curPos
         return this.rectangles.find(rect =>
             x >= rect.x && x <= rect.x + rect.width &&
             y >= rect.y && y <= rect.y + rect.height
-        );
+        )
     }
 
     // 矩形を削除
     deleteRectangle(rect) {
         // TODO：要検討。ID 比較が必要？
-        this.rectangles = this.rectangles.filter(r => r !== rect);
+        this.rectangles = this.rectangles.filter(r => r !== rect)
     }
 
 
@@ -179,8 +179,8 @@ export class CanvasImageController {
 
     // ImagePartRegistrationProcess で処理した矩形データで元の矩形データを更新
     updateRectangleStatus(sourceRect, processedRect) {
-        sourceRect.partNumberRegistered = processedRect.partNumberRegistered;
-        sourceRect.transitionImageRegistered = processedRect.transitionImageRegistered;
+        sourceRect.partNumberRegistered = processedRect.partNumberRegistered
+        sourceRect.transitionImageRegistered = processedRect.transitionImageRegistered
     }
 
     //
@@ -204,10 +204,10 @@ export class CanvasImageController {
     // 相対座標は、0 ~ 1 (特に小数点以下を丸めていない)
     convertToRelativeCoordinates(rect) {
         // 画像の左上からの矩形の相対座標を計算
-        const relativeX = (rect.x - this.imgPos.x) / this.imgPos.width;
-        const relativeY = (rect.y - this.imgPos.y) / this.imgPos.height;
-        const relativeWidth = rect.width / this.imgPos.width;
-        const relativeHeight = rect.height / this.imgPos.height;
+        const relativeX = (rect.x - this.imgPos.x) / this.imgPos.width
+        const relativeY = (rect.y - this.imgPos.y) / this.imgPos.height
+        const relativeWidth = rect.width / this.imgPos.width
+        const relativeHeight = rect.height / this.imgPos.height
 
         return {
             x: relativeX,
@@ -222,14 +222,14 @@ export class CanvasImageController {
     //
     // ドラッグした矩形が既存のいずれかの矩形と重複していないか確認
     checkOverlap() {
-        return this.rectangles.some(rect => this.checkRectanglesOverlap(rect, this.currentRect));
+        return this.rectangles.some(rect => this.checkRectanglesOverlap(rect, this.currentRect))
     }
 
     checkRectanglesOverlap(rect1, rect2) {
         return !(rect2.x > rect1.x + rect1.width ||
             rect2.x + rect2.width < rect1.x ||
             rect2.y > rect1.y + rect1.height ||
-            rect2.y + rect2.height < rect1.y);
+            rect2.y + rect2.height < rect1.y)
     }
 
     // 矩形が画像内にあるかチェック
@@ -238,14 +238,14 @@ export class CanvasImageController {
         return rect.x >= this.imgPos.x &&
             rect.x + rect.width <= this.imgPos.x + this.imgPos.width &&
             rect.y >= this.imgPos.y &&
-            rect.y + rect.height <= this.imgPos.y + this.imgPos.height;
+            rect.y + rect.height <= this.imgPos.y + this.imgPos.height
     }
 
     //
     // ErrorHandler
     //
     handleRectangleCreationError(message) {
-        if (message) alert(message);
+        if (message) alert(message)
         this.updateCanvas()
         this.resetDraggingState()
     }
@@ -281,7 +281,7 @@ export class CanvasImageController {
     }
 
     handleRectDrawingContinue(curPos) {
-        if (!this.isDragging) return;
+        if (!this.isDragging) return
 
         this.updateCanvas()
 
@@ -291,24 +291,25 @@ export class CanvasImageController {
     }
 
     handleRectDrawingEnd() {
-        if (!this.isDragging || !this.currentRect) return;
+        if (!this.isDragging || !this.currentRect) return
 
         // 高さと幅が無い矩形は登録しない
         if (this.currentRect.width === 0 || this.currentRect.height === 0) {
-            this.handleRectangleCreationError(null);
-            return;
-        };
+            this.handleRectangleCreationError(null)
+            return
+        }
+
 
         // 矩形が画像内にあるかチェック
         if (!this.checkWithinImage()) {
-            this.handleRectangleCreationError('画像の範囲外を選択しています！');
-            return;
+            this.handleRectangleCreationError('画像の範囲外を選択しています！')
+            return
         }
 
         // 矩形の重複チェック
         if (this.checkOverlap()) {
-            this.handleRectangleCreationError('描画範囲が重複しています！');
-            return;
+            this.handleRectangleCreationError('描画範囲が重複しています！')
+            return
         }
 
         this.addCurrentRectangle()
@@ -330,10 +331,10 @@ export class CanvasImageController {
     // onRectSelected をセットしていない場合、デフォルトのコンテキストメニューを表示し、
     // セットされている場合は、右クリックした場所にある矩形情報を取得し、onRectSelectedを呼び出す
     async handleRectSelect(curPos) {
-        if (!this.onRectSelected) return;
+        if (!this.onRectSelected) return
 
-        const selectedRect = this.findRectangleAtPosition(curPos);
-        if (!selectedRect) return;
+        const selectedRect = this.findRectangleAtPosition(curPos)
+        if (!selectedRect) return
 
         // ImagePartRegistrationProcess で利用できる形に変換する
         const formattedRect = this.formatRectangle(selectedRect)
@@ -344,7 +345,7 @@ export class CanvasImageController {
             this.updateCanvas()
             console.log('登録後の矩形情報一覧', this.rectangles)
         } catch (err) {
-            console.error('部位番号 or 遷移先画像の登録失敗', err);
+            console.error('部位番号 or 遷移先画像の登録失敗', err)
         }
     }
 
@@ -356,9 +357,9 @@ export class CanvasImageController {
     }
 
     handleLongPressStart(e) {
-        this.longPressTriggered = false;
+        this.longPressTriggered = false
         this.longPressTimer = setTimeout(async () => {
-            this.longPressTriggered = true;
+            this.longPressTriggered = true
             // TODO: 共通化
             const touch = e.touches[0] // 最初のタッチポイントを取得
             const curPos = {
@@ -366,7 +367,7 @@ export class CanvasImageController {
                 y: touch.clientY
             }
             await this.handleRectSelect(curPos)
-        }, 500);  // 500msがロングタップとして扱う
+        }, 500)  // 500msがロングタップとして扱う
     }
 
     handleTouchDrawStart(e) {
@@ -393,8 +394,8 @@ export class CanvasImageController {
     handleTouchEnd(e) {
         clearTimeout(this.longPressTimer)
         if (!this.longPressTriggered) {
-            this.handleRectDrawingEnd();
+            this.handleRectDrawingEnd()
         }
-        this.longPressTriggered = false;
+        this.longPressTriggered = false
     }
 }

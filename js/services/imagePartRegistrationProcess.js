@@ -4,26 +4,26 @@ export class ImagePartRegistrationProcess {
     constructor() {
         this.modals = document.querySelectorAll('.modal')
         // アクション選択
-        this.actionSelectionModal = document.getElementById('action-selection-modal');
-        this.actionSelectionCancelBtn = this.actionSelectionModal.querySelector('.cancel-btn');
-        this.actionSelectionNextBtn = this.actionSelectionModal.querySelector('.next-btn');
+        this.actionSelectionModal = document.getElementById('action-selection-modal')
+        this.actionSelectionCancelBtn = this.actionSelectionModal.querySelector('.cancel-btn')
+        this.actionSelectionNextBtn = this.actionSelectionModal.querySelector('.next-btn')
         // 部位番号登録
-        this.partNumberModal = document.getElementById('part-number-modal');
-        this.partNumberCancelBtn = this.partNumberModal.querySelector('.cancel-btn');
-        this.partNumberRegisterBtn = this.partNumberModal.querySelector('.register-btn');
-        this.partNumberInput = this.partNumberModal.querySelector('#part-number-input');
+        this.partNumberModal = document.getElementById('part-number-modal')
+        this.partNumberCancelBtn = this.partNumberModal.querySelector('.cancel-btn')
+        this.partNumberRegisterBtn = this.partNumberModal.querySelector('.register-btn')
+        this.partNumberInput = this.partNumberModal.querySelector('#part-number-input')
         // 遷移先画像登録
-        this.transitionImageModal = document.getElementById('transition-image-modal');
-        this.transitionImageCancelBtn = this.transitionImageModal.querySelector('.cancel-btn');
-        this.transitionImageRegisterBtn = this.transitionImageModal.querySelector('.register-btn');
-        this.transitionImageInput = this.transitionImageModal.querySelector('#transition-image-input');
+        this.transitionImageModal = document.getElementById('transition-image-modal')
+        this.transitionImageCancelBtn = this.transitionImageModal.querySelector('.cancel-btn')
+        this.transitionImageRegisterBtn = this.transitionImageModal.querySelector('.register-btn')
+        this.transitionImageInput = this.transitionImageModal.querySelector('#transition-image-input')
 
-        this.rect = null; // 選択している矩形の相対座標と登録ステータスを管理するステート
+        this.rect = null // 選択している矩形の相対座標と登録ステータスを管理するステート
 
         this.onRegistrationSuccess = null // 登録成功時に呼び出すコールバック
         this.onRegistrationFailure = null // 登録失敗時に呼び出すコールバック
 
-        this.setupEventListeners();
+        this.setupEventListeners()
     }
 
     // TODO: クラス関数にしてもいいのでは？
@@ -35,9 +35,9 @@ export class ImagePartRegistrationProcess {
         // 登録失敗時、error を投げる
         // 登録キャンセル時、this.rect を返す
         return new Promise((resolve, reject) => {
-            this.onRegistrationSuccess = () => resolve(this.rect);
-            this.onRegistrationFailure = (error) => reject(error);
-        });
+            this.onRegistrationSuccess = () => resolve(this.rect)
+            this.onRegistrationFailure = (error) => reject(error)
+        })
     }
 
     //
@@ -45,26 +45,26 @@ export class ImagePartRegistrationProcess {
     //
     setupEventListeners() {
         // アクション選択
-        this.actionSelectionCancelBtn.addEventListener('click', () => this.handleRegistrationCancel());
-        this.actionSelectionNextBtn.addEventListener('click', () => this.handleNext());
+        this.actionSelectionCancelBtn.addEventListener('click', () => this.handleRegistrationCancel())
+        this.actionSelectionNextBtn.addEventListener('click', () => this.handleNext())
         this.setupSelectionTypeListeners()
         // 部位番号登録
-        this.partNumberCancelBtn.addEventListener('click', () => this.handleModalClose(this.partNumberModal));
-        this.partNumberRegisterBtn.addEventListener('click', () => this.handlePartNumberRegister());
+        this.partNumberCancelBtn.addEventListener('click', () => this.handleModalClose(this.partNumberModal))
+        this.partNumberRegisterBtn.addEventListener('click', () => this.handlePartNumberRegister())
         this.partNumberInput.addEventListener('input', () => {
             this.handleRegisterBtnEnable(this.partNumberInput, this.partNumberRegisterBtn)
-        });
+        })
         // 遷移先画像登録
-        this.transitionImageCancelBtn.addEventListener('click', () => this.handleModalClose(this.transitionImageModal));
-        this.transitionImageRegisterBtn.addEventListener('click', () => this.handleTransitionImageRegister());
+        this.transitionImageCancelBtn.addEventListener('click', () => this.handleModalClose(this.transitionImageModal))
+        this.transitionImageRegisterBtn.addEventListener('click', () => this.handleTransitionImageRegister())
         this.transitionImageInput.addEventListener('input', () => {
             this.handleRegisterBtnEnable(this.transitionImageInput, this.transitionImageRegisterBtn)
-        });
+        })
     }
 
     // ラジオボタンの選択状態に応じて「次へ」ボタンを有効化する
     setupSelectionTypeListeners() {
-        const selectionInputs = this.actionSelectionModal.querySelectorAll('input[name="selection-type"]');
+        const selectionInputs = this.actionSelectionModal.querySelectorAll('input[name="selection-type"]')
         selectionInputs.forEach(input => {
             input.addEventListener('change', () => this.handleNextBtnEnable())
         })
@@ -72,18 +72,18 @@ export class ImagePartRegistrationProcess {
 
     handleNextBtnEnable() {
         if (document.querySelector('input[name="selection-type"]:checked')) {
-            this.actionSelectionNextBtn.disabled = false;
+            this.actionSelectionNextBtn.disabled = false
         } else {
-            this.actionSelectionNextBtn.disabled = true;
+            this.actionSelectionNextBtn.disabled = true
         }
     }
 
     // 入力の有無に応じてボタンの有効/無効を切り替える
     handleRegisterBtnEnable(inputElement, buttonElement) {
         if (inputElement.value.trim() !== '') {
-            buttonElement.disabled = false;
+            buttonElement.disabled = false
         } else {
-            buttonElement.disabled = true;
+            buttonElement.disabled = true
         }
     }
 
@@ -111,24 +111,24 @@ export class ImagePartRegistrationProcess {
     openModal(targetModal) {
         this.modals.forEach(modal => {
             if (modal === targetModal) {
-                modal.style.display = 'block';
-                modal.classList.remove('inactive');
+                modal.style.display = 'block'
+                modal.classList.remove('inactive')
             } else {
-                modal.classList.add('inactive');
+                modal.classList.add('inactive')
             }
-        });
+        })
     }
 
     closeModal(targetModal) {
-        targetModal.style.display = 'none';
+        targetModal.style.display = 'none'
         // TODO：ロジック要見直し
-        this.modals.forEach(modal => modal.classList.remove('inactive'));
+        this.modals.forEach(modal => modal.classList.remove('inactive'))
     }
 
     closeAllModals() {
-        this.closeModal(this.partNumberModal);
-        this.closeModal(this.transitionImageModal);
-        this.closeModal(this.actionSelectionModal);
+        this.closeModal(this.partNumberModal)
+        this.closeModal(this.transitionImageModal)
+        this.closeModal(this.actionSelectionModal)
     }
 
     //
@@ -166,24 +166,24 @@ export class ImagePartRegistrationProcess {
     resetActionSelectionModal() {
         // ラジオボタンの選択を解除
         this.actionSelectionModal.querySelectorAll('input[name="selection-type"]').forEach(radio => {
-            radio.checked = false;
-        });
+            radio.checked = false
+        })
 
         // 次へボタンを無効化
-        this.actionSelectionNextBtn.disabled = true;
+        this.actionSelectionNextBtn.disabled = true
     }
 
     //
     // アクション選択モーダル
     //
     handleNext() {
-        const selectionType= this.actionSelectionModal.querySelector('input[name="selection-type"]:checked').value;
+        const selectionType = this.actionSelectionModal.querySelector('input[name="selection-type"]:checked').value
         if (selectionType === 'part-number') {
-            this.openPartNumberModal();
+            this.openPartNumberModal()
         } else if (selectionType === 'transition-image') {
-            this.openTransitionImageModal();
+            this.openTransitionImageModal()
         } else if (selectionType === 'delete-rect') {
-            this.deleteRect();
+            this.deleteRect()
         }
     }
 
