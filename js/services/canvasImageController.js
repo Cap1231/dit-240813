@@ -26,7 +26,7 @@ export class CanvasImageController {
         this.canvas.addEventListener('mousemove', e => this.handleRectDrawingContinue(e));
         this.canvas.addEventListener('mouseup', e => this.handleRectDrawingEnd(e));
         // 矩形を右クリックで選択
-        this.canvas.addEventListener('contextmenu', e => this.handleRectSelect(e));
+        this.canvas.addEventListener('contextmenu', e => this.handleRectRightClick(e));
 
         // TODO: Refactor
         // タッチイベント
@@ -318,26 +318,22 @@ export class CanvasImageController {
         this.resetDraggingState()
     }
 
-    // onRectSelected をセットしていない場合、デフォルトのコンテキストメニューを表示し、
-    // セットされている場合は、右クリックした場所にある矩形情報を取得し、onRectSelectedを呼び出す
-    async handleRectSelect(e) {
-        if (!this.onRectSelected) return;
-
+    async handleRectRightClick(e) {
         e.preventDefault()  // デフォルトのコンテキストメニューをキャンセル
 
-        let curPos = {}
-        if (e.touches) {
-            const touch = e.touches[0] // 最初のタッチポイントを取得
-            curPos = {
-                x: touch.clientX,
-                y: touch.clientY
-            }
-        } else {
-            curPos = {
-                x: e.offsetX,
-                y: e.offsetY
-            }
+        const curPos = {
+            x: e.offsetX,
+            y: e.offsetY
         }
+
+        await this.handleRectSelect(curPos)
+    }
+
+    // onRectSelected をセットしていない場合、デフォルトのコンテキストメニューを表示し、
+    // セットされている場合は、右クリックした場所にある矩形情報を取得し、onRectSelectedを呼び出す
+    async handleRectSelect(curPos) {
+        if (!this.onRectSelected) return;
+
         const selectedRect = this.findRectangleAtPosition(curPos);
         if (!selectedRect) return;
 
@@ -358,7 +354,13 @@ export class CanvasImageController {
         this.longPressTriggered = false;
         this.longPressTimer = setTimeout(async () => {
             this.longPressTriggered = true;
-            await this.handleRectSelect(e)
+            // TODO: 共通化
+            const touch = e.touches[0] // 最初のタッチポイントを取得
+            const curPos = {
+                x: touch.clientX,
+                y: touch.clientY
+            }
+            await this.handleRectSelect(curPos)
         }, 500);  // 500msがロングタップとして扱う
     }
 
