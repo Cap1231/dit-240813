@@ -26,6 +26,17 @@ export class ImagePartRegistrationProcess {
         this.setupEventListeners()
     }
 
+    /**
+     * モーダルを開いて矩形登録、削除プロセスを開始。
+     * 成功、失敗、キャンセルの各シナリオに基づいて適切な処理を行い、
+     * Promise を通じて結果を返す。
+     *
+     * @param {Object} targetRect - 処理対象の矩形データ。必要な矩形の情報を含むオブジェクト。
+     * @returns {Promise<Object>}
+     * 登録、削除が成功した場合、更新された矩形データを返す。
+     * 登録、削除が失敗した場合、エラーを返す。
+     * 登録、削除がキャンセルされた場合、矩形データを返す。
+     */
     start(targetRect) {
         this.rect = targetRect
         this.openModal(this.actionSelectionModal)
