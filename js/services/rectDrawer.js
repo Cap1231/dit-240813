@@ -6,7 +6,7 @@ export class RectDrawer {
         this.ctx = this.canvas.getContext('2d')
         this.img = new Image()
         this.imgPos = null // Canvas内で表示している画像の絶対座標
-        this.rects = rects // 描画した矩形全ての絶対座標
+        this.rects = [] // 描画した矩形全ての絶対座標
         this.currentRect = null // 描画中の矩形の絶対座標
         this.startPos = null // ドラッグ開始点の絶対座標
         this.isDrawing = false
@@ -14,7 +14,7 @@ export class RectDrawer {
         this.longPressTimer = null // ロングプレスタイマーのIDを保持
         this.longPressTriggered = false // ロングプレスがトリガーされたかどうか
 
-        this.setupImage(imageUrl)
+        this.setupImage(imageUrl, rects)
         this.setupEventListeners()
         this.drawRects()
     }
@@ -32,16 +32,16 @@ export class RectDrawer {
         this.canvas.addEventListener('touchend', e => this.handleTouchEnd(e))
     }
 
-    setupImage(imageUrl) {
+    setupImage(imageUrl, rects) {
         this.img.src = imageUrl
         this.img.onload = () => {
             this.resizeCanvas()
             this.imgPos = this.getImagePosition()
             this.drawImage()
-            if (this.rects.length > 0) {
-                this.rects = this.rects.map(rect => this.calcAbsoluteRectPos(rect));
-                console.log(this.rects)
-                this.drawRects();
+            if (rects.length > 0) {
+                // NOTE: Imageを描画した後でないと矩形は描画できない
+                this.rects = rects.map(rect => this.calcAbsoluteRectPos(rect))
+                this.drawRects()
             }
         }
     }

@@ -1,14 +1,21 @@
 import { RectDrawer } from "./services/rectDrawer.js"
 import { RectActionProcess } from "./services/rectActionProcess.js"
 
-document.addEventListener('DOMContentLoaded', () => {
-    const existingRects = [{ x: 0.1, y: 0.2, width: 0.2, height: 0.5 }, { x: 0.6, y: 0.8, width: 0.1, height: 0.2 }];
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // TODO: 適当なJsonデータ読み込んでので、置き換えてください
+        const resp = await fetch('../json/rects.json')
+        const rects = await resp.json()
 
-    const rectDrawer = new RectDrawer('myCanvas', '../img/sample1.png', existingRects)
-    const rectActionProcess = new RectActionProcess()
+        const rectDrawer = new RectDrawer('myCanvas', '../img/sample1.png', rects)
+        const rectActionProcess = new RectActionProcess()
 
-    rectDrawer.onRectSelected = async (rect) => {
-        const processedRect = await rectActionProcess.start(rect)
-        return processedRect
+        rectDrawer.onRectSelected = async (rect) => {
+            const processedRect = await rectActionProcess.start(rect)
+            return processedRect
+        }
+    } catch (err) {
+        console.error('Failed to fetch rectangles:', err)
     }
+
 })
