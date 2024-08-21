@@ -40,9 +40,10 @@ export class RectDrawer {
             this.drawImage()
             if (rects.length > 0) {
                 // NOTE: Imageを描画した後でないと矩形は描画できない
-                this.rects = rects.map(rect => this.calcAbsoluteRectPos(rect))
+                this.rects = rects.map(rect => this.convertToRectWithAbsolute(rect))
                 this.drawRects()
             }
+            console.log(this.rects)
         }
     }
 
@@ -262,14 +263,42 @@ export class RectDrawer {
         this.isDrawing = false
     }
 
-    // ImagePartRegistrationProcess で利用できる形に変換する
-    formatRect(rect) {
+    // 絶対座標を持つ rect に変換する
+    // RectDrawer で利用
+    convertToRectWithAbsolute(rect) {
+        return {
+            ...this.calcAbsoluteRectPos(rect),
+            id: rect.id,
+            partNumberRegistered: rect.partNumberRegistered,
+            transitionImageRegistered: rect.transitionImageRegistered,
+            deleted: false,
+        }
+    }
+
+    // 相対座標を持つ rect に変換する
+    // RectActionProcess で利用
+    convertToRectWithRelative(rect) {
         return {
             ...this.calcRelativeRectPos(rect),
             partNumberRegistered: rect.partNumberRegistered,
             transitionImageRegistered: rect.transitionImageRegistered,
             deleted: false,
         }
+    }
+
+    // 相対座標から矩形の絶対座標を算出する
+    calcAbsoluteRectPos(relativeRect) {
+        const absoluteX = this.imgPos.x + (relativeRect.x * this.imgPos.width)
+        const absoluteY = this.imgPos.y + (relativeRect.y * this.imgPos.height)
+        const absoluteWidth = relativeRect.width * this.imgPos.width
+        const absoluteHeight = relativeRect.height * this.imgPos.height
+
+        return {
+            x: absoluteX,
+            y: absoluteY,
+            width: absoluteWidth,
+            height: absoluteHeight
+        };
     }
 
     // 矩形の絶対座標から相対座標を算出する
@@ -287,21 +316,6 @@ export class RectDrawer {
             width: relativeWidth,
             height: relativeHeight
         }
-    }
-
-    // 相対座標から矩形の絶対座標を算出する
-    calcAbsoluteRectPos(relativeRect) {
-        const absoluteX = this.imgPos.x + (relativeRect.x * this.imgPos.width)
-        const absoluteY = this.imgPos.y + (relativeRect.y * this.imgPos.height)
-        const absoluteWidth = relativeRect.width * this.imgPos.width
-        const absoluteHeight = relativeRect.height * this.imgPos.height
-
-        return {
-            x: absoluteX,
-            y: absoluteY,
-            width: absoluteWidth,
-            height: absoluteHeight
-        };
     }
 
     //
@@ -383,15 +397,15 @@ export class RectDrawer {
     async processSelectedRect(curPos) {
         if (!this.onRectSelected) return
 
-        const selectedRect = this.findRectAtPosition(curPos)
-        if (!selectedRect) return
+        const targetRect = this.findRectAtPosition(curPos)
+        if (!targetRect) return
 
-        // ImagePartRegistrationProcess で利用できる形に変換する
-        const formattedRect = this.formatRect(selectedRect)
+        // RectActionProcess で利用できる形に変換する
+        const rectWithRelative = this.convertToRectWithRelative(targetRect)
 
         try {
-            const processedRect = await this.onRectSelected(formattedRect)
-            this.updateOrDeleteTargetRect(selectedRect, processedRect)
+            const processedRect = await this.onRectSelected(rectWithRelative)
+            this.updateOrDeleteTargetRect(targetRect, processedRect)
             this.updateCanvas()
             console.log('登録後の矩形情報一覧', this.rects)
         } catch (err) {
