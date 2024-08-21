@@ -1,12 +1,12 @@
 import {COLORS} from "../constants"
 
 export class RectDrawer {
-    constructor(canvasId, imageUrl) {
+    constructor(canvasId, imageUrl, rects = []) {
         this.canvas = document.getElementById(canvasId)
         this.ctx = this.canvas.getContext('2d')
         this.img = new Image()
         this.imgPos = null // Canvas内で表示している画像の絶対座標
-        this.rects = [] // 描画した矩形全ての絶対座標
+        this.rects = rects // 描画した矩形全ての絶対座標
         this.currentRect = null // 描画中の矩形の絶対座標
         this.startPos = null // ドラッグ開始点の絶対座標
         this.isDrawing = false
@@ -16,6 +16,7 @@ export class RectDrawer {
 
         this.setupImage(imageUrl)
         this.setupEventListeners()
+        this.drawRects()
     }
 
     setupEventListeners() {
@@ -37,6 +38,11 @@ export class RectDrawer {
             this.resizeCanvas()
             this.imgPos = this.getImagePosition()
             this.drawImage()
+            if (this.rects.length > 0) {
+                this.rects = this.rects.map(rect => this.calcAbsoluteRectPos(rect));
+                console.log(this.rects)
+                this.drawRects();
+            }
         }
     }
 
@@ -281,6 +287,21 @@ export class RectDrawer {
             width: relativeWidth,
             height: relativeHeight
         }
+    }
+
+    // 相対座標から矩形の絶対座標を算出する
+    calcAbsoluteRectPos(relativeRect) {
+        const absoluteX = this.imgPos.x + (relativeRect.x * this.imgPos.width)
+        const absoluteY = this.imgPos.y + (relativeRect.y * this.imgPos.height)
+        const absoluteWidth = relativeRect.width * this.imgPos.width
+        const absoluteHeight = relativeRect.height * this.imgPos.height
+
+        return {
+            x: absoluteX,
+            y: absoluteY,
+            width: absoluteWidth,
+            height: absoluteHeight
+        };
     }
 
     //
