@@ -182,7 +182,6 @@ export class ImagePartRegistrationProcess {
 
     closeModal(targetModal) {
         targetModal.style.display = 'none'
-        // TODO：ロジック要見直し
         this.modals.forEach(modal => modal.classList.remove('inactive'))
     }
 
