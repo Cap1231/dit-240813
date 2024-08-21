@@ -168,7 +168,10 @@ export class RectDrawer {
 
     // ドラッグ(タッチ)した矩形を rects に追加
     addCurrentRect() {
-        this.rects.push(this.currentRect)
+        this.rects.push({
+            ...this.currentRect,
+            id: null,
+        })
     }
 
     // ドラッグ(タッチ)している矩形 currentRect を更新
@@ -193,8 +196,13 @@ export class RectDrawer {
         if (processedRect.deleted === true) {
             this.deleteTargetRect(targetRect)
         } else {
+            this.updateTargetRectId(targetRect, processedRect)
             this.updateTargetRectStatus(targetRect, processedRect)
         }
+    }
+
+    updateTargetRectId(targetRect, processedRect) {
+        targetRect.id = processedRect.id
     }
 
     // 指定した矩形の登録ステータスを processedRect で更新
@@ -297,7 +305,7 @@ export class RectDrawer {
             y: absoluteY,
             width: absoluteWidth,
             height: absoluteHeight
-        };
+        }
     }
 
     // 矩形の絶対座標から相対座標を算出する

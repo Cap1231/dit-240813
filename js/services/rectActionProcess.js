@@ -126,11 +126,13 @@ export class RectActionProcess {
     }
 
     // 部位番号の登録
-    handlePartNumberRegister() {
+    async handlePartNumberRegister() {
         try {
             console.log('部位番号を登録する矩形', this.rect)
             // TODO: this.rect を利用して、部位番号登録 API 叩く
 
+            // TODO: DBに作成後、BEから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
+            this.rect.id = this.rect.id || 999
             this.updateRegisteredStatus('partNumber')
             this.processRegistrationSuccess()
         } catch (err) {
@@ -140,11 +142,13 @@ export class RectActionProcess {
     }
 
     // 遷移先画像の登録
-    handleTransitionImageRegister() {
+    async handleTransitionImageRegister() {
         try {
             console.log('遷移先画像を登録する矩形', this.rect)
             // TODO: this.rect を利用(?)して、遷移先画像登録 API 叩く
 
+            // TODO: DBに作成後、BEから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
+            this.rect.id = this.rect.id || 999
             this.updateRegisteredStatus('transitionImage')
             this.processRegistrationSuccess()
         } catch (err) {
@@ -154,7 +158,7 @@ export class RectActionProcess {
     }
 
     // 矩形の削除
-    handleRectDelete() {
+    async handleRectDelete() {
         try {
             console.log('削除する矩形', this.rect)
             // TODO: this.rect を利用して、矩形削除 APIを叩く
