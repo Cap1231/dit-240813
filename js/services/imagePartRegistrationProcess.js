@@ -26,7 +26,6 @@ export class ImagePartRegistrationProcess {
         this.setupEventListeners()
     }
 
-    // TODO: クラス関数にしてもいいのでは？
     start(targetRect) {
         this.rect = targetRect
         this.openModal(this.actionSelectionModal)
@@ -62,6 +61,28 @@ export class ImagePartRegistrationProcess {
         })
     }
 
+    // 登録キャンセル時の処理
+    handleRegistrationCancel() {
+        this.resetActionSelectionModal()
+        this.closeAllModals()
+        if (this.onRegistrationSuccess) this.onRegistrationSuccess()
+    }
+
+    // アクション選択モーダルでアクションを選択後、次へボタンを押した後の処理
+    // - 部位番号登録モーダルを開く
+    // - 遷移先画像登録モーダルを開く
+    // - 矩形を削除
+    handleNext() {
+        const selectionType = this.actionSelectionModal.querySelector('input[name="selection-type"]:checked').value
+        if (selectionType === 'part-number') {
+            this.handleModalOpen(this.partNumberModal)
+        } else if (selectionType === 'transition-image') {
+            this.handleModalOpen(this.transitionImageModal)
+        } else if (selectionType === 'delete-rect') {
+            this.handleRectDelete()
+        }
+    }
+
     // ラジオボタンの選択状態に応じて「次へ」ボタンを有効化する
     setupSelectionTypeListeners() {
         const selectionInputs = this.actionSelectionModal.querySelectorAll('input[name="selection-type"]')
@@ -78,7 +99,16 @@ export class ImagePartRegistrationProcess {
         }
     }
 
-    // 入力の有無に応じてボタンの有効/無効を切り替える
+    handleModalOpen(targetModal) {
+        this.openModal(targetModal)
+    }
+
+    handleModalClose(targetModal) {
+        this.closeModal(targetModal)
+    }
+
+    // 部位番号登録モーダル ＆ 遷移先画像登録モーダル
+    // 入力の有無に応じて登録ボタンの有効/無効を切り替える
     handleRegisterBtnEnable(inputElement, buttonElement) {
         if (inputElement.value.trim() !== '') {
             buttonElement.disabled = false
@@ -87,22 +117,42 @@ export class ImagePartRegistrationProcess {
         }
     }
 
-    handleModalClose(targetModal) {
-        this.closeModal(targetModal)
-    }
-
-    // 登録ステータスを更新する関数
-    updateRegisteredStatus(type) {
-        if (type === 'partNumber') {
-            this.rect.partNumberRegistered = true
-        } else if (type === 'transitionImage') {
-            this.rect.transitionImageRegistered = true
+    // 部位番号の登録
+    handlePartNumberRegister() {
+        try {
+            // TODO: this.rect を利用して、部位番号登録 API 叩く
+            console.log('選択している矩形の相対座標:', this.rect)
+            this.updateRegisteredStatus('partNumber')
+            this.processRegistrationSuccess()
+        } catch (err) {
+            console.error('部位番号の登録失敗')
+            this.processRegistrationFailure(err)
         }
     }
 
-    // 登録ステータスを更新する関数
-    updateDeletedStatus() {
-        this.rect.deleted = true
+    // 遷移先画像の登録
+    handleTransitionImageRegister() {
+        try {
+            // TODO: this.rect を利用(?)して、遷移先画像登録 API 叩く
+            console.log('選択している矩形の相対座標:', this.rect)
+            this.updateRegisteredStatus('transitionImage')
+            this.processRegistrationSuccess()
+        } catch (err) {
+            console.error('遷移先画像の登録失敗', err)
+            this.processRegistrationFailure(err)
+        }
+    }
+
+    // 矩形の削除
+    handleRectDelete() {
+        try {
+            // TODO: this.rect を利用して、矩形削除 APIを叩く
+            this.updateDeletedStatus()
+            this.processRegistrationSuccess()
+        } catch (err) {
+            console.error('矩形削除失敗', err)
+            this.processRegistrationFailure(err)
+        }
     }
 
     //
@@ -132,37 +182,42 @@ export class ImagePartRegistrationProcess {
     }
 
     //
-    // 登録後、途中キャンセルの処理
+    // ステート管理
+    //
+    // 登録ステータスを更新する関数
+    updateRegisteredStatus(type) {
+        if (type === 'partNumber') {
+            this.rect.partNumberRegistered = true
+        } else if (type === 'transitionImage') {
+            this.rect.transitionImageRegistered = true
+        }
+    }
+
+    // 削除ステータスを更新する関数
+    updateDeletedStatus() {
+        this.rect.deleted = true
+    }
+
+    //
+    // 登録後の処理
     //
     // 登録成功後の処理
-    afterRegistrationSuccess() {
-        this.resetInputFields()
+    processRegistrationSuccess() {
+        this.resetPartNumberModal()
+        this.resetTransitionImageModal()
         this.resetActionSelectionModal()
         this.closeAllModals()
         if (this.onRegistrationSuccess) this.onRegistrationSuccess()
     }
 
     // 登録失敗後の処理
-    afterRegistrationFailure(err) {
+    processRegistrationFailure(err) {
         if (this.onRegistrationFailure) this.onRegistrationFailure(err)
     }
 
-    // 登録キャンセル時の処理
-    handleRegistrationCancel() {
-        this.resetActionSelectionModal()
-        this.closeAllModals()
-        if (this.onRegistrationSuccess) this.onRegistrationSuccess()
-    }
-
     //
-    // 入力値のクリア
+    // モーダル内の入力値のクリア
     //
-    resetInputFields() {
-        // テキスト入力フィールドをクリア
-        this.partNumberInput.value = ''
-        this.transitionImageInput.value = ''
-    }
-
     resetActionSelectionModal() {
         // ラジオボタンの選択を解除
         this.actionSelectionModal.querySelectorAll('input[name="selection-type"]').forEach(radio => {
@@ -173,66 +228,13 @@ export class ImagePartRegistrationProcess {
         this.actionSelectionNextBtn.disabled = true
     }
 
-    //
-    // アクション選択モーダル
-    //
-    handleNext() {
-        const selectionType = this.actionSelectionModal.querySelector('input[name="selection-type"]:checked').value
-        if (selectionType === 'part-number') {
-            this.openPartNumberModal()
-        } else if (selectionType === 'transition-image') {
-            this.openTransitionImageModal()
-        } else if (selectionType === 'delete-rect') {
-            this.deleteRect()
-        }
+    resetPartNumberModal() {
+        // テキスト入力フィールドをクリア
+        this.partNumberInput.value = ''
     }
 
-    openPartNumberModal() {
-        this.openModal(this.partNumberModal)
-    }
-
-    openTransitionImageModal() {
-        this.openModal(this.transitionImageModal)
-    }
-
-    //
-    // 部位番号登録モーダル
-    //
-    handlePartNumberRegister() {
-        try {
-            // TODO: this.rect を利用して、部位番号登録 API 叩く
-            console.log('選択している矩形の相対座標:', this.rect)
-            this.updateRegisteredStatus('partNumber')
-            this.afterRegistrationSuccess()
-        } catch (err) {
-            console.error('部位番号の登録失敗')
-            this.afterRegistrationFailure(err)
-        }
-    }
-
-    //
-    // 遷移先画像登録モーダル
-    //
-    handleTransitionImageRegister() {
-        try {
-            // TODO: this.rect を利用(?)して、遷移先画像登録 API 叩く
-            console.log('選択している矩形の相対座標:', this.rect)
-            this.updateRegisteredStatus('transitionImage')
-            this.afterRegistrationSuccess()
-        } catch (err) {
-            console.error('遷移先画像の登録失敗', err)
-            this.afterRegistrationFailure(err)
-        }
-    }
-
-    deleteRect() {
-        try {
-            // TODO: this.rect を利用して、矩形削除 APIを叩く
-            this.updateDeletedStatus()
-            this.afterRegistrationSuccess()
-        } catch (err) {
-            console.error('矩形削除失敗', err)
-            this.afterRegistrationFailure(err)
-        }
+    resetTransitionImageModal() {
+        // テキスト入力フィールドをクリア
+        this.transitionImageInput.value = ''
     }
 }

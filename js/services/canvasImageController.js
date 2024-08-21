@@ -358,7 +358,7 @@ export class CanvasImageController {
     }
 
     // onRectSelected をセットしていない場合、デフォルトのコンテキストメニューを表示し、
-    // セットされている場合は、右クリックした場所にある矩形情報を取得し、onRectSelectedを呼び出す
+    // セットされている場合は、右クリック(ロングタップ)した場所にある矩形情報を取得し、onRectSelectedを呼び出す
     async processSelectedRect(curPos) {
         if (!this.onRectSelected) return
 
