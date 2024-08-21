@@ -41,9 +41,6 @@ export class ImagePartRegistrationProcess {
         this.rect = targetRect
         this.openModal(this.actionSelectionModal)
 
-        // 登録成功時、this.rect を返す
-        // 登録失敗時、error を投げる
-        // 登録キャンセル時、this.rect を返す
         return new Promise((resolve, reject) => {
             this.onRegistrationSuccess = () => resolve(this.rect)
             this.onRegistrationFailure = (error) => reject(error)
