@@ -1,12 +1,12 @@
-import { CanvasImageController } from "./services/canvasImageController.js";
-import { ImagePartRegistrationProcess } from "./services/imagePartRegistrationProcess.js";
+import { RectDrawer } from "./services/rectDrawer.js"
+import { RectActionProcess } from "./services/rectActionProcess.js"
 
 document.addEventListener('DOMContentLoaded', () => {
-    const canvasImageController = new CanvasImageController('myCanvas', '../img/sample1.png');
-    const imagePartRegistrationProcess = new ImagePartRegistrationProcess();
+    const rectDrawer = new RectDrawer('myCanvas', '../img/sample1.png')
+    const rectActionProcess = new RectActionProcess()
 
-    canvasImageController.onRectSelected = async (rect) => {
-        const processedRect = await imagePartRegistrationProcess.start(rect)
+    rectDrawer.onRectSelected = async (rect) => {
+        const processedRect = await rectActionProcess.start(rect)
         return processedRect
-    };
-});
+    }
+})

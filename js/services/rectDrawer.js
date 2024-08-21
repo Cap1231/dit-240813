@@ -1,6 +1,6 @@
 import {COLORS} from "../constants"
 
-export class CanvasImageController {
+export class RectDrawer {
     constructor(canvasId, imageUrl) {
         this.canvas = document.getElementById(canvasId)
         this.ctx = this.canvas.getContext('2d')

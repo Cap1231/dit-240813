@@ -1,6 +1,6 @@
 // アクション選択 -> 部位番号登録
 // アクション選択 -> 遷移先画像登録
-export class ImagePartRegistrationProcess {
+export class RectActionProcess {
     constructor() {
         this.modals = document.querySelectorAll('.modal')
         // アクション選択
