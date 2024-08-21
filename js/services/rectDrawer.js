@@ -43,7 +43,7 @@ export class RectDrawer {
                 this.rects = rects.map(rect => this.convertToRectWithAbsolute(rect))
                 this.drawRects()
             }
-            console.log(this.rects)
+            console.log('初回に描画する矩形', this.rects)
         }
     }
 
@@ -279,9 +279,8 @@ export class RectDrawer {
     // RectActionProcess で利用
     convertToRectWithRelative(rect) {
         return {
+            ...rect,
             ...this.calcRelativeRectPos(rect),
-            partNumberRegistered: rect.partNumberRegistered,
-            transitionImageRegistered: rect.transitionImageRegistered,
             deleted: false,
         }
     }
@@ -390,6 +389,7 @@ export class RectDrawer {
         this.addCurrentRect()
         this.updateCanvas()
         this.resetRectDrawState()
+        console.log('新しい矩形描画後の矩形一覧', this.rects)
     }
 
     // onRectSelected をセットしていない場合、デフォルトのコンテキストメニューを表示し、
@@ -407,9 +407,9 @@ export class RectDrawer {
             const processedRect = await this.onRectSelected(rectWithRelative)
             this.updateOrDeleteTargetRect(targetRect, processedRect)
             this.updateCanvas()
-            console.log('登録後の矩形情報一覧', this.rects)
+            console.log('登録 or 削除後の矩形一覧', this.rects)
         } catch (err) {
-            console.error('部位番号 or 遷移先画像の登録失敗', err)
+            console.error('部位番号の登録、遷移先画像の登録、削除のいずれかの失敗', err)
         }
     }
 
