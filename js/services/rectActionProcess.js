@@ -172,8 +172,13 @@ export class RectActionProcess {
     // 矩形の削除
     async handleRectDelete() {
         try {
-            console.log('削除する矩形', this.rect)
-            // TODO: this.rect を利用して、矩形削除 APIを叩く
+            console.log('矩形を削除')
+            console.log('矩形情報', this.rect)
+
+            // ID がある場合は、DBからも矩形削除
+            if (this.rect.id) {
+                // TODO: 矩形削除 API
+            }
 
             this.updateDeletedStatus()
             this.processRegistrationSuccess()
