@@ -190,15 +190,27 @@ export class RectDrawer {
     }
 
     // ドラッグ(タッチ)した矩形を rects に追加
-    addCurrentRect() {
+    addRect(targetRect) {
         this.rects.push({
-            ...this.currentRect,
+            ...targetRect,
             id: null,
         })
     }
 
-    // ドラッグ(タッチ)している矩形 currentRect を更新
-    updateCurrentRect(curPos) {
+    // rects から引数で指定した矩形を削除
+    deleteRect(targetRect) {
+        this.rects = this.rects.filter(r => r !== targetRect)
+    }
+
+    // targetRect を propertiesToUpdate で更新（ミュータブル）
+    updateRect(targetRect, propertiesToUpdate) {
+        Object.keys(propertiesToUpdate).forEach(key => {
+            targetRect[key] = propertiesToUpdate[key]
+        })
+    }
+
+    // ドラッグ(タッチ)している矩形 currentRect を再計算（イミュータブル)
+    calcCurrentRect(curPos) {
         this.currentRect = {
             ...this.currentRect,
             ...this.calcCurrentRectPos(curPos),
@@ -217,10 +229,10 @@ export class RectDrawer {
     // 指定した矩形を processedRect で更新 or 指定した矩形を rects から削除
     updateOrDeleteTargetRect(targetRect, processedRectRelative) {
         if (processedRectRelative.deleted === true) {
-            this.deleteTargetRect(targetRect)
+            this.deleteRect(targetRect)
         } else {
             const processedRect = this.convertToProcessedRectAbsolute(processedRectRelative, targetRect)
-            this.updateTargetRect(targetRect, processedRect)
+            this.updateRect(targetRect, processedRect)
         }
     }
 
@@ -233,18 +245,6 @@ export class RectDrawer {
             width: targetRect.width,
             height: targetRect.height,
         }
-    }
-
-    // targetRect を propertiesToUpdate で更新
-    updateTargetRect(targetRect, propertiesToUpdate) {
-        Object.keys(propertiesToUpdate).forEach(key => {
-            targetRect[key] = propertiesToUpdate[key]
-        })
-    }
-
-    // rects から引数で指定した矩形を削除
-    deleteTargetRect(targetRect) {
-        this.rects = this.rects.filter(r => r !== targetRect)
     }
 
     // curPos と startPos から、矩形情報を計算する
@@ -397,7 +397,7 @@ export class RectDrawer {
         this.updateCanvas()
 
         // 現在ドラッグしている矩形を描画
-        this.updateCurrentRect(curPos)
+        this.calcCurrentRect(curPos)
         this.drawCurrentRect()
     }
 
@@ -423,7 +423,7 @@ export class RectDrawer {
             return
         }
 
-        this.addCurrentRect()
+        this.addRect(this.currentRect)
         this.updateCanvas()
         this.resetRectDrawState()
         console.log('新しい矩形描画後の矩形一覧', this.rects)
