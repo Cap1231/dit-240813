@@ -78,6 +78,7 @@ export class RectDrawer {
     //
     // PC の右クリックの代わりは、長押し
     handleTouchStart(e) {
+        if (this.isMultiTouch(e)) return
         // 長押し
         this.setLongPressDetection(e)
 
@@ -88,13 +89,17 @@ export class RectDrawer {
     }
 
     handleTouchMove(e) {
+        if (this.isMultiTouch(e)) return
         clearTimeout(this.longPressTimer)
+
         const curPos = this.getCurrentTouchPos(e)
         this.updateRectDraw(curPos)
     }
 
     handleTouchEnd(e) {
+        if (this.isMultiTouch(e)) return
         clearTimeout(this.longPressTimer)
+
         if (this.longPressTriggered) {
             this.longPressTriggered = false
         } else {
@@ -376,6 +381,11 @@ export class RectDrawer {
             rect.x + rect.width <= this.imgPos.x + this.imgPos.width &&
             rect.y >= this.imgPos.y &&
             rect.y + rect.height <= this.imgPos.y + this.imgPos.height
+    }
+
+    // 複数のタッチがあればtrueを返す
+    isMultiTouch(e) {
+        return e.touches.length > 1
     }
 
     //
