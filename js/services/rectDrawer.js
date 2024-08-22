@@ -164,6 +164,7 @@ export class RectDrawer {
         const allRegistered = rect.partNumberRegistered && rect.transitionImageRegistered
         const targetColor = allRegistered ? COLORS.registered : COLORS.inProgress
         this.ctx.strokeStyle = targetColor
+        this.ctx.lineWidth = 4
         this.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height)
 
         if (rect.id) this.drawId(rect, targetColor)
