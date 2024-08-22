@@ -128,11 +128,16 @@ export class RectActionProcess {
     // 部位番号の登録
     async handlePartNumberRegister() {
         try {
+            this.rect.partNumber = this.partNumberInput.value
             console.log('部位番号を登録する矩形', this.rect)
-            // TODO: this.rect を利用して、部位番号登録 API 叩く
+            if (!this.rect.id) {
+                // TODO: 部位番号新規登録 API
+                // TODO: DBに登録後、APIから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
+                this.rect.id = 999
+            } else {
+                // TODO: 部位番号更新 API
+            }
 
-            // TODO: DBに作成後、BEから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
-            this.rect.id = this.rect.id || 999
             this.updateRegisteredStatus('partNumber')
             this.processRegistrationSuccess()
         } catch (err) {
@@ -144,11 +149,16 @@ export class RectActionProcess {
     // 遷移先画像の登録
     async handleTransitionImageRegister() {
         try {
+            this.rect.transitionImagePath = this.transitionImageInput.value
             console.log('遷移先画像を登録する矩形', this.rect)
-            // TODO: this.rect を利用(?)して、遷移先画像登録 API 叩く
+            if (!this.rect.id) {
+                // TODO: 部位番号新規登録 API
+                // TODO: DBに登録後、APIから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
+                this.rect.id = 999
+            } else {
+                // TODO: 部位番号更新 API
+            }
 
-            // TODO: DBに作成後、BEから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
-            this.rect.id = this.rect.id || 999
             this.updateRegisteredStatus('transitionImage')
             this.processRegistrationSuccess()
         } catch (err) {
@@ -199,7 +209,8 @@ export class RectActionProcess {
     //
     // ステート管理
     //
-    // 登録ステータスを更新する関数
+    // 登録ステータスを更新する
+    // TODO: partNumberとtransitionImagePathで管理するなら不要
     updateRegisteredStatus(type) {
         if (type === 'partNumber') {
             this.rect.partNumberRegistered = true
@@ -208,11 +219,12 @@ export class RectActionProcess {
         }
     }
 
-    // 削除ステータスを更新する関数
+    // 削除ステータスを更新する
     updateDeletedStatus() {
         this.rect.deleted = true
     }
 
+    // TODO: Delete 後も呼び出されているので関数名を変更
     //
     // 登録後の処理
     //

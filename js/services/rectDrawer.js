@@ -216,23 +216,31 @@ export class RectDrawer {
     }
 
     // 指定した矩形を processedRect で更新 or 指定した矩形を rects から削除
-    updateOrDeleteTargetRect(targetRect, processedRect) {
-        if (processedRect.deleted === true) {
+    updateOrDeleteTargetRect(targetRect, processedRectRelative) {
+        if (processedRectRelative.deleted === true) {
             this.deleteTargetRect(targetRect)
         } else {
-            this.updateTargetRectId(targetRect, processedRect)
-            this.updateTargetRectStatus(targetRect, processedRect)
+            const processedRect = this.convertToProcessedRectAbsolute(processedRectRelative, targetRect)
+            this.updateTargetRect(targetRect, processedRect)
         }
     }
 
-    updateTargetRectId(targetRect, processedRect) {
-        targetRect.id = processedRect.id
+    // TODO: 関数名、変数名要検討
+    convertToProcessedRectAbsolute(processedRectRelative, targetRect) {
+        return {
+            ...processedRectRelative,
+            x: targetRect.x,
+            y: targetRect.y,
+            width: targetRect.width,
+            height: targetRect.height,
+        }
     }
 
-    // 指定した矩形の登録ステータスを processedRect で更新
-    updateTargetRectStatus(targetRect, processedRect) {
-        targetRect.partNumberRegistered = processedRect.partNumberRegistered
-        targetRect.transitionImageRegistered = processedRect.transitionImageRegistered
+    // targetRect を propertiesToUpdate で更新
+    updateTargetRect(targetRect, propertiesToUpdate) {
+        Object.keys(propertiesToUpdate).forEach(key => {
+            targetRect[key] = propertiesToUpdate[key]
+        })
     }
 
     // rects から引数で指定した矩形を削除
@@ -283,7 +291,9 @@ export class RectDrawer {
             width: 0,
             height: 0,
             partNumberRegistered: false,
-            transitionImageRegistered: false
+            partNumber: null,
+            transitionImageRegistered: false,
+            transitionImagePath: null,
         }
         this.isDrawing = true
     }
@@ -299,10 +309,8 @@ export class RectDrawer {
     // RectDrawer で利用
     convertToRectWithAbsolute(rect) {
         return {
+            ...rect,
             ...this.calcAbsoluteRectPos(rect),
-            id: rect.id,
-            partNumberRegistered: rect.partNumberRegistered,
-            transitionImageRegistered: rect.transitionImageRegistered,
             deleted: false,
         }
     }
@@ -433,11 +441,11 @@ export class RectDrawer {
         if (!targetRect) return
 
         // RectActionProcess で利用できる形に変換する
-        const rectWithRelative = this.convertToRectWithRelative(targetRect)
+        const targetRectRelative = this.convertToRectWithRelative(targetRect)
 
         try {
-            const processedRect = await this.onRectSelected(rectWithRelative)
-            this.updateOrDeleteTargetRect(targetRect, processedRect)
+            const processedRectRelative = await this.onRectSelected(targetRectRelative)
+            this.updateOrDeleteTargetRect(targetRect, processedRectRelative)
             this.updateCanvas()
             console.log('登録 or 削除後の矩形一覧', this.rects)
         } catch (err) {

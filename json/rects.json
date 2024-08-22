@@ -6,7 +6,9 @@
     "width": 0.2,
     "height": 0.5,
     "partNumberRegistered": false,
-    "transitionImageRegistered": false
+    "partNumber": null,
+    "transitionImageRegistered": false,
+    "transitionImagePath": null
   },
   {
     "id": 2,
@@ -15,7 +17,9 @@
     "width": 0.1,
     "height": 0.2,
     "partNumberRegistered": false,
-    "transitionImageRegistered": true
+    "partNumber": null,
+    "transitionImageRegistered": true,
+    "transitionImagePath": "https://abc.co.jp/xxx/yyy1.jpg"
   },
   {
     "id": 3,
@@ -24,6 +28,8 @@
     "width": 0.2,
     "height": 0.2,
     "partNumberRegistered": true,
-    "transitionImageRegistered": true
+    "partNumber": "12345",
+    "transitionImageRegistered": true,
+    "transitionImagePath": "https://abc.co.jp/xxx/yyy2.jpg"
   }
 ]
