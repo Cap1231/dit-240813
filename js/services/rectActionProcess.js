@@ -141,10 +141,10 @@ export class RectActionProcess {
             }
 
             this.updatePartNumber()
-            this.processRegistrationSuccess()
+            this.processActionSuccess()
         } catch (err) {
             console.error('部位番号の登録失敗')
-            this.processRegistrationFailure(err)
+            this.processActionFailure(err)
         }
     }
 
@@ -164,10 +164,10 @@ export class RectActionProcess {
             }
 
             this.updateTransitionImagePath()
-            this.processRegistrationSuccess()
+            this.processActionSuccess()
         } catch (err) {
             console.error('遷移先画像の登録失敗', err)
-            this.processRegistrationFailure(err)
+            this.processActionFailure(err)
         }
     }
 
@@ -183,10 +183,10 @@ export class RectActionProcess {
             }
 
             this.updateDeletedStatus()
-            this.processRegistrationSuccess()
+            this.processActionSuccess()
         } catch (err) {
             console.error('矩形削除失敗', err)
-            this.processRegistrationFailure(err)
+            this.processActionFailure(err)
         }
     }
 
@@ -237,10 +237,10 @@ export class RectActionProcess {
 
     // TODO: Delete 後も呼び出されているので関数名を変更
     //
-    // 登録後の処理
+    // 登録、削除後の処理
     //
-    // 登録成功後の処理
-    processRegistrationSuccess() {
+    // 登録、削除成功後の処理
+    processActionSuccess() {
         this.resetPartNumberModal()
         this.resetTransitionImageModal()
         this.resetActionSelectionModal()
@@ -248,8 +248,8 @@ export class RectActionProcess {
         if (this.onRegistrationSuccess) this.onRegistrationSuccess()
     }
 
-    // 登録失敗後の処理
-    processRegistrationFailure(err) {
+    // 登録、削除失敗後の処理
+    processActionFailure(err) {
         if (this.onRegistrationFailure) this.onRegistrationFailure(err)
     }
 
