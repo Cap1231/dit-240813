@@ -162,8 +162,31 @@ export class RectDrawer {
     // partNumber と　transitionImage が登録済みの矩形は、緑色になる。それ以外は、赤色
     drawRect(rect) {
         const allRegistered = rect.partNumberRegistered && rect.transitionImageRegistered
-        this.ctx.strokeStyle = allRegistered ? COLORS.registered : COLORS.inProgress
+        const targetColor = allRegistered ? COLORS.registered : COLORS.inProgress
+        this.ctx.strokeStyle = targetColor
         this.ctx.strokeRect(rect.x, rect.y, rect.width, rect.height)
+
+        if (rect.id) this.drawId(rect, targetColor)
+    }
+
+    // 矩形内の左上にIDを描画
+    drawId(rect, bgColor) {
+        const text = `${rect.id}`
+        const fontSize = 14
+        const textMargin = 5
+        const textX = rect.x + textMargin
+        const textY = rect.y + fontSize
+        const textWidth = this.ctx.measureText(text).width
+        const textHeight = fontSize
+
+        // テキストの背景色を設定
+        this.ctx.fillStyle = bgColor
+        this.ctx.fillRect(textX - textMargin, rect.y, textWidth + (textMargin * 2), textHeight + textMargin);
+
+        // テキストを描画
+        this.ctx.fillStyle = '#fff' // テキスト色
+        this.ctx.font = `${fontSize}px Arial` // フォント設定
+        this.ctx.fillText(text, textX, textY)
     }
 
     // ドラッグ(タッチ)した矩形を rects に追加
