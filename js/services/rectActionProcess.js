@@ -134,12 +134,13 @@ export class RectActionProcess {
             if (!this.rect.id) {
                 // TODO: 部位番号新規登録 API
                 // TODO: DBに登録後、APIから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
-                this.rect.id = 999
+                const created_rect_id = 999
+                this.updateId(created_rect_id)
             } else {
                 // TODO: 部位番号更新 API
             }
 
-            this.rect.partNumber = this.partNumberInput.value
+            this.updatePartNumber()
             this.processRegistrationSuccess()
         } catch (err) {
             console.error('部位番号の登録失敗')
@@ -156,12 +157,13 @@ export class RectActionProcess {
             if (!this.rect.id) {
                 // TODO: 部位番号新規登録 API
                 // TODO: DBに登録後、APIから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
-                this.rect.id = 999
+                const created_rect_id = 999
+                this.updateId(created_rect_id)
             } else {
                 // TODO: 部位番号更新 API
             }
 
-            this.rect.transitionImagePath = this.transitionImageInput.value
+            this.updateTransitionImagePath()
             this.processRegistrationSuccess()
         } catch (err) {
             console.error('遷移先画像の登録失敗', err)
@@ -214,8 +216,20 @@ export class RectActionProcess {
     }
 
     //
-    // ステート管理
+    // ステート管理 - rect の更新
     //
+    updateId(id) {
+        this.rect.id = id
+    }
+
+    updatePartNumber() {
+        this.rect.partNumber = this.partNumberInput.value
+    }
+
+    updateTransitionImagePath() {
+        this.rect.transitionImagePath = this.transitionImageInput.value
+    }
+
     // 削除ステータスを更新する
     updateDeletedStatus() {
         this.rect.deleted = true
