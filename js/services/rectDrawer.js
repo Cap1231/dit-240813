@@ -16,7 +16,6 @@ export class RectDrawer {
 
         this.setupImage(imageUrl, rects)
         this.setupEventListeners()
-        this.drawRects()
     }
 
     setupEventListeners() {
