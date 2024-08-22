@@ -80,14 +80,14 @@ export class RectActionProcess {
     // - 部位番号登録モーダルを開く
     // - 遷移先画像登録モーダルを開く
     // - 矩形を削除
-    handleNext() {
+    async handleNext() {
         const selectionType = this.actionSelectionModal.querySelector('input[name="selection-type"]:checked').value
         if (selectionType === 'part-number') {
             this.handleModalOpen(this.partNumberModal)
         } else if (selectionType === 'transition-image') {
             this.handleModalOpen(this.transitionImageModal)
         } else if (selectionType === 'delete-rect') {
-            this.handleRectDelete()
+            await this.handleRectDelete()
         }
     }
 
@@ -128,8 +128,9 @@ export class RectActionProcess {
     // 部位番号の登録
     async handlePartNumberRegister() {
         try {
-            this.rect.partNumber = this.partNumberInput.value
-            console.log('部位番号を登録する矩形', this.rect)
+            console.log('部位番号を登録')
+            console.log('矩形情報', this.rect)
+            console.log('部位番号', this.partNumberInput.value)
             if (!this.rect.id) {
                 // TODO: 部位番号新規登録 API
                 // TODO: DBに登録後、APIから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
@@ -138,7 +139,7 @@ export class RectActionProcess {
                 // TODO: 部位番号更新 API
             }
 
-            this.updateRegisteredStatus('partNumber')
+            this.rect.partNumber = this.partNumberInput.value
             this.processRegistrationSuccess()
         } catch (err) {
             console.error('部位番号の登録失敗')
@@ -149,8 +150,9 @@ export class RectActionProcess {
     // 遷移先画像の登録
     async handleTransitionImageRegister() {
         try {
-            this.rect.transitionImagePath = this.transitionImageInput.value
-            console.log('遷移先画像を登録する矩形', this.rect)
+            console.log('遷移先画像を登録')
+            console.log('矩形情報', this.rect)
+            console.log('遷移先画像パス', this.transitionImageInput.value)
             if (!this.rect.id) {
                 // TODO: 部位番号新規登録 API
                 // TODO: DBに登録後、APIから返って来るIDを想定して適当にセットしてます。API追加後、こちらも変更してください
@@ -159,7 +161,7 @@ export class RectActionProcess {
                 // TODO: 部位番号更新 API
             }
 
-            this.updateRegisteredStatus('transitionImage')
+            this.rect.transitionImagePath = this.transitionImageInput.value
             this.processRegistrationSuccess()
         } catch (err) {
             console.error('遷移先画像の登録失敗', err)
@@ -209,16 +211,6 @@ export class RectActionProcess {
     //
     // ステート管理
     //
-    // 登録ステータスを更新する
-    // TODO: partNumberとtransitionImagePathで管理するなら不要
-    updateRegisteredStatus(type) {
-        if (type === 'partNumber') {
-            this.rect.partNumberRegistered = true
-        } else if (type === 'transitionImage') {
-            this.rect.transitionImageRegistered = true
-        }
-    }
-
     // 削除ステータスを更新する
     updateDeletedStatus() {
         this.rect.deleted = true

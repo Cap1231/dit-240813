@@ -5,9 +5,7 @@
     "y": 0.2,
     "width": 0.2,
     "height": 0.5,
-    "partNumberRegistered": false,
     "partNumber": null,
-    "transitionImageRegistered": false,
     "transitionImagePath": null
   },
   {
@@ -16,9 +14,7 @@
     "y": 0.8,
     "width": 0.1,
     "height": 0.2,
-    "partNumberRegistered": false,
     "partNumber": null,
-    "transitionImageRegistered": true,
     "transitionImagePath": "https://abc.co.jp/xxx/yyy1.jpg"
   },
   {
@@ -27,9 +23,7 @@
     "y": 0.1,
     "width": 0.2,
     "height": 0.2,
-    "partNumberRegistered": true,
     "partNumber": "12345",
-    "transitionImageRegistered": true,
     "transitionImagePath": "https://abc.co.jp/xxx/yyy2.jpg"
   }
 ]

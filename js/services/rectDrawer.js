@@ -161,7 +161,7 @@ export class RectDrawer {
     // 引数で渡された矩形を描画
     // partNumber と　transitionImage が登録済みの矩形は、緑色になる。それ以外は、赤色
     drawRect(rect) {
-        const allRegistered = rect.partNumberRegistered && rect.transitionImageRegistered
+        const allRegistered = rect.partNumber && rect.transitionImagePath
         const targetColor = allRegistered ? COLORS.registered : COLORS.inProgress
         this.ctx.strokeStyle = targetColor
         this.ctx.lineWidth = 4
@@ -290,9 +290,7 @@ export class RectDrawer {
             y: curPos.y,
             width: 0,
             height: 0,
-            partNumberRegistered: false,
             partNumber: null,
-            transitionImageRegistered: false,
             transitionImagePath: null,
         }
         this.isDrawing = true
