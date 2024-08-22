@@ -39,6 +39,7 @@ export class RectActionProcess {
      */
     start(targetRect) {
         this.rect = targetRect
+        this.setupInitInputValue()
         this.openModal(this.actionSelectionModal)
 
         return new Promise((resolve, reject) => {
@@ -67,6 +68,11 @@ export class RectActionProcess {
         this.transitionImageInput.addEventListener('input', () => {
             this.handleRegisterBtnEnable(this.transitionImageInput, this.transitionImageRegisterBtn)
         })
+    }
+
+    setupInitInputValue() {
+        this.partNumberInput.value = this.rect.partNumber
+        this.transitionImageInput.value = this.rect.transitionImagePath
     }
 
     // 登録キャンセル時の処理
