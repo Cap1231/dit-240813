@@ -44,3 +44,17 @@
 #action-selection-modal input[type="radio"] {
     margin-right: 8px;
 }
+/* 部位番号登録モーダル */
+#part-number-input {
+    height: 21px; /* 遷移先画像登録モーダルのinputの高さに揃える */
+}
+/* 遷移先画像登録モーダル */
+#action-selection-modal .modal-body {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+#transition-image-input {
+    width: 50%;
+    height: 21px; /* 参照ボタンの高さに揃える */
+}

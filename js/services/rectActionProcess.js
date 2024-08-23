@@ -17,6 +17,7 @@ export class RectActionProcess {
         this.transitionImageCancelBtn = this.transitionImageModal.querySelector('.cancel-btn')
         this.transitionImageRegisterBtn = this.transitionImageModal.querySelector('.register-btn')
         this.transitionImageInput = this.transitionImageModal.querySelector('#transition-image-input')
+        this.transitionImageReferBtn = this.transitionImageModal.querySelector('.refer-btn')
 
         this.rect = null // 選択している矩形の相対座標と登録ステータスを管理するステート
 
@@ -65,6 +66,7 @@ export class RectActionProcess {
         // 遷移先画像登録
         this.transitionImageCancelBtn.addEventListener('click', () => this.handleModalClose(this.transitionImageModal))
         this.transitionImageRegisterBtn.addEventListener('click', () => this.handleTransitionImageRegister())
+        this.transitionImageReferBtn.addEventListener('click', () => console.log("参照ボタン押されました。未実装")) // TODO: 実装してください
         this.transitionImageInput.addEventListener('input', () => {
             this.handleRegisterBtnEnable(this.transitionImageInput, this.transitionImageRegisterBtn)
         })
