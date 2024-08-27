@@ -1,5 +1,9 @@
-// アクション選択 -> 部位番号登録
-// アクション選択 -> 遷移先画像登録
+/**
+ * 矩形の登録、更新、削除プロセスを管理する
+ * ユーザーがGUIを介して矩形の情報を入力し、登録や更新を行うためのモーダルの操作を処理する
+ * 各モーダルには専用のイベントリスナーが設定され、適切なアクションに応じた処理を行う
+ *
+ */
 export class RectActionProcess {
     constructor() {
         this.modals = document.querySelectorAll('.modal')
