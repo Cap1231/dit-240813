@@ -100,7 +100,7 @@ export class RectDrawer {
 
     handleTouchMove(e) {
         if (this.isMultiTouch(e)) return
-        clearTimeout(this.longPressTimer)
+        this.cancelLongPressDetection()
 
         const curPos = this.getCurrentTouchPos(e)
         this.updateRectDraw(curPos)
@@ -108,7 +108,7 @@ export class RectDrawer {
 
     handleTouchEnd(e) {
         if (this.isMultiTouch(e)) return
-        clearTimeout(this.longPressTimer)
+        this.cancelLongPressDetection()
 
         if (this.longPressTriggered) {
             this.longPressTriggered = false
@@ -398,9 +398,6 @@ export class RectDrawer {
         return e.touches.length > 1
     }
 
-    //
-    // Event Handler の中身
-    //
     // 500ms をロングタップとして扱う
     setLongPressDetection(e) {
         this.longPressTriggered = false
@@ -409,6 +406,10 @@ export class RectDrawer {
             const curPos = this.getCurrentTouchPos(e)
             await this.processSelectedRect(curPos)
         }, 500)
+    }
+
+    cancelLongPressDetection() {
+        clearTimeout(this.longPressTimer)
     }
 
     updateRectDraw(curPos) {
