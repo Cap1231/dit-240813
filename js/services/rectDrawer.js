@@ -49,7 +49,7 @@ export class RectDrawer {
             this.drawImage()
             if (rects.length > 0) {
                 // NOTE: Imageを描画した後でないと矩形は描画できない
-                this.rects = rects.map(rect => this.convertToRectWithAbsolute(rect))
+                this.rects = rects.map(rect => this.convertToRectAbsolute(rect))
                 this.drawRects()
             }
             console.log('初回に描画する矩形', this.rects)
@@ -246,12 +246,12 @@ export class RectDrawer {
         if (processedRectRelative.deleted === true) {
             this.deleteRect(targetRect)
         } else {
-            const processedRect = this.convertToProcessedRectAbsolute(processedRectRelative, targetRect)
-            this.updateRect(targetRect, processedRect)
+            const processedRectAbsolute = this.revertToProcessedRectAbsolute(processedRectRelative, targetRect)
+            this.updateRect(targetRect, processedRectAbsolute)
         }
     }
 
-    convertToProcessedRectAbsolute(processedRectRelative, targetRect) {
+    revertToProcessedRectAbsolute(processedRectRelative, targetRect) {
         return {
             ...processedRectRelative,
             x: targetRect.x,
@@ -318,7 +318,7 @@ export class RectDrawer {
 
     // 絶対座標を持つ rect に変換する
     // RectDrawer で利用
-    convertToRectWithAbsolute(rect) {
+    convertToRectAbsolute(rect) {
         return {
             ...rect,
             ...this.calcAbsoluteRectPos(rect),
@@ -328,7 +328,7 @@ export class RectDrawer {
 
     // 相対座標を持つ rect に変換する
     // RectActionProcess で利用
-    convertToRectWithRelative(rect) {
+    convertToRectRelative(rect) {
         return {
             ...rect,
             ...this.calcRelativeRectPos(rect),
@@ -458,7 +458,7 @@ export class RectDrawer {
         if (!targetRect) return
 
         // RectActionProcess で利用できる形に変換する
-        const targetRectRelative = this.convertToRectWithRelative(targetRect)
+        const targetRectRelative = this.convertToRectRelative(targetRect)
 
         try {
             const processedRectRelative = await this.onRectSelected(targetRectRelative)
