@@ -1,5 +1,15 @@
-import {COLORS} from "../constants"
+import { COLORS } from "../constants"
 
+
+/**
+ * Canvas 上で画像を表示し、その上に矩形を描画する
+ * ドラッグ(タップ)操作を通じて矩形を描画する
+ * 描画された矩形をの中で、右クリック(ロングタップ)するとコールバックを呼び出される
+ *
+ * @param {string} canvasId - 矩形を描画するCanvasののID
+ * @param {string} imageUrl - Canvas上に表示する画像のURL
+ * @param {Array} rects - 初期状態でCanvasに描画する矩形の配列（オプション）
+ */
 export class RectDrawer {
     constructor(canvasId, imageUrl, rects = []) {
         this.canvas = document.getElementById(canvasId)
