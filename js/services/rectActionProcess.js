@@ -247,7 +247,6 @@ export class RectActionProcess {
         this.rect.deleted = true
     }
 
-    // TODO: Delete 後も呼び出されているので関数名を変更
     //
     // 登録、削除後の処理
     //
