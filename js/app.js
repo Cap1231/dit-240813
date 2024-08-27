@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const resp = await fetch('../json/rects.json')
         const rects = await resp.json()
 
-        const rectDrawer = new RectDrawer('myCanvas', '../img/sample1.png', rects)
+        const rectDrawer = new RectDrawer('rect-draw-canvas', '../img/sample1.png', rects)
         const rectActionProcess = new RectActionProcess()
 
         rectDrawer.onRectSelected = async (rect) => {
