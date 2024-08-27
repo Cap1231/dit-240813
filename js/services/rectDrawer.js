@@ -251,7 +251,6 @@ export class RectDrawer {
         }
     }
 
-    // TODO: 関数名、変数名要検討
     convertToProcessedRectAbsolute(processedRectRelative, targetRect) {
         return {
             ...processedRectRelative,
