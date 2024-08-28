@@ -242,22 +242,12 @@ export class RectDrawer {
     }
 
     // 指定した矩形を processedRect で更新 or 指定した矩形を rects から削除
-    updateOrDeleteTargetRect(targetRect, processedRectRelative) {
-        if (processedRectRelative.deleted === true) {
+    updateOrDeleteTargetRect(targetRect, processedRect) {
+        if (processedRect.deleted === true) {
             this.deleteRect(targetRect)
         } else {
-            const processedRectAbsolute = this.revertToProcessedRectAbsolute(processedRectRelative, targetRect)
-            this.updateRect(targetRect, processedRectAbsolute)
-        }
-    }
-
-    revertToProcessedRectAbsolute(processedRectRelative, targetRect) {
-        return {
-            ...processedRectRelative,
-            x: targetRect.x,
-            y: targetRect.y,
-            width: targetRect.width,
-            height: targetRect.height,
+            const propertiesToUpdate = this.extractPropertiesToUpdate(processedRect)
+            this.updateRect(targetRect, propertiesToUpdate)
         }
     }
 
@@ -322,7 +312,6 @@ export class RectDrawer {
         return {
             ...rect,
             ...this.calcAbsoluteRectPos(rect),
-            deleted: false,
         }
     }
 
@@ -332,7 +321,24 @@ export class RectDrawer {
         return {
             ...rect,
             ...this.calcRelativeRectPos(rect),
+        }
+    }
+
+    // RectActionProcess で利用できる形に変換する
+    // RectActionProcess 内で削除処理があるので、削除フラグを持たせている
+    convertToProcessRect(targetRect) {
+        return {
+            ...this.convertToRectRelative(targetRect),
             deleted: false,
+        }
+    }
+
+    // RectActionProcess で更新されたPropertiesを抽出
+    extractPropertiesToUpdate(processedRect) {
+        return {
+            id: processedRect.id,
+            partNumber: processedRect.partNumber,
+            transitionImagePath: processedRect.transitionImagePath,
         }
     }
 
@@ -458,11 +464,11 @@ export class RectDrawer {
         if (!targetRect) return
 
         // RectActionProcess で利用できる形に変換する
-        const targetRectRelative = this.convertToRectRelative(targetRect)
+        const processRect = this.convertToProcessRect(targetRect)
 
         try {
-            const processedRectRelative = await this.onRectSelected(targetRectRelative)
-            this.updateOrDeleteTargetRect(targetRect, processedRectRelative)
+            const processedRect = await this.onRectSelected(processRect)
+            this.updateOrDeleteTargetRect(targetRect, processedRect)
             this.updateCanvas()
             console.log('登録 or 削除後の矩形一覧', this.rects)
         } catch (err) {
